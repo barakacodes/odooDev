@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_forecourt_credit_customer"
+              name="Credit Customers"
+              parent="forecourt_operations.menu_forecourt_inventory"
+              action="action_forecourt_credit_customer"
+              sequence="30"/>
+
+    <menuitem id="menu_forecourt_credit_import"
+              name="Import NetPOS Report"
+              parent="forecourt_operations.menu_forecourt_operations"
+              action="action_forecourt_credit_import_wizard"
+              sequence="6"/>
+</odoo>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_shift_list" model="ir.ui.view">
+        <field name="name">forecourt.shift.list</field>
+        <field name="model">forecourt.shift</field>
+        <field name="arch" type="xml">
+            <list string="Shifts" decoration-muted="state=='closed'">
+                <field name="name"/>
+                <field name="branch"/>
+                <field name="shift_type"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="supervisor_id"/>
+                <field name="total_revenue" sum="Total Revenue"/>
+                <field name="total_fuel_litres" sum="Total Fuel (L)"/>
+                <field name="total_lpg_units" sum="Total LPG"/>
+                <field name="state" widget="badge"
+                       decoration-success="state=='open'"
+                       decoration-muted="state=='closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_shift_form" model="ir.ui.view">
+        <field name="name">forecourt.shift.form</field>
+        <field name="model">forecourt.shift</field>
+        <field name="arch" type="xml">
+            <form string="Forecourt Shift">
+                <header>
+                    <button name="action_close_shift" string="Close Shift"
+                            type="object" class="btn-primary"
+                            invisible="state != 'open'"
+                            confirm="Close this shift? This will lock all sales entries."/>
+                    <button name="action_reopen_shift" string="Re-open Shift"
+                            type="object"
+                            invisible="state != 'closed'"
+                            groups="forecourt_operations.group_forecourt_manager"/>
+                    <button name="action_print_shift_report" string="Print Shift Report"
+                            type="object" class="btn-secondary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Shift Details">
+                            <field name="branch"/>
+                            <field name="shift_type"/>
+                            <field name="date_start"/>
+                            <field name="date_end" readonly="1"/>
+                            <field name="supervisor_id"/>
+                            <field name="cashier_ids" widget="many2many_tags"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Revenue Summary" readonly="1">
+                            <field name="total_revenue"/>
+                            <field name="total_fuel_litres"/>
+                            <field name="total_lpg_units"/>
+                            <field name="total_lubricant_revenue"/>
+                            <separator/>
+                            <field name="cash_total"/>
+                            <field name="mobile_money_total"/>
+                            <field name="card_total"/>
+                            <field name="credit_total"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Handover notes…"/>
+                    <notebook>
+                        <page string="Sales" name="sales">
+                            <field name="sale_ids" readonly="1">
+                                <list decoration-muted="state=='cancelled'">
+                                    <field name="name"/>
+                                    <field name="sale_datetime"/>
+                                    <field name="product_type"/>
+                                    <field name="product_id"/>
+                                    <field name="pump_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="total_amount" sum="Total"/>
+                                    <field name="payment_method"/>
+                                    <field name="cashier_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state=='posted'"
+                                           decoration-warning="state=='draft'"
+                                           decoration-danger="state=='cancelled'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Meter Readings" name="meters">
+                            <field name="meter_ids" readonly="1">
+                                <list>
+                                    <field name="reading_datetime"/>
+                                    <field name="pump_id"/>
+                                    <field name="nozzle_id"/>
+                                    <field name="reading_type"/>
+                                    <field name="meter_value"/>
+                                    <field name="previous_reading"/>
+                                    <field name="volume"/>
+                                    <field name="recorded_by"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_shift" model="ir.actions.act_window">
+        <field name="name">Shifts</field>
+        <field name="res_model">forecourt.shift</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <record id="view_forecourt_shift_search" model="ir.ui.view">
+        <field name="name">forecourt.shift.search</field>
+        <field name="model">forecourt.shift</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="supervisor_id"/>
+                <filter name="arcades" string="Arcades" domain="[('branch','=','arcades')]"/>
+                <filter name="luanshya" string="Luanshya" domain="[('branch','=','luanshya')]"/>
+                <filter name="open" string="Open Shifts" domain="[('state','=','open')]"/>
+                <filter name="closed" string="Closed Shifts" domain="[('state','=','closed')]"/>
+                <filter name="today" string="Today"
+                        domain="[('date_start','&gt;=',datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),
+                                  ('date_start','&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_shift_type" string="Shift Type"
+                            context="{'group_by': 'shift_type'}"/>
+                    <filter name="group_supervisor" string="Supervisor"
+                            context="{'group_by': 'supervisor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

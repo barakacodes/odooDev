@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ZRA Sales Register (checklist #30, #31) — one row per invoice line,
+         so "description of goods/services" is meaningful per spec wording.
+         Exportable to Excel/CSV via the native list view Export action. -->
+    <record id="view_zra_sales_register_list" model="ir.ui.view">
+        <field name="name">zra.sales.register.list</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <list string="ZRA Sales Register" create="0" edit="0" delete="0">
+                <field name="move_id" string="Invoice Number"/>
+                <field name="date" string="Invoice Date"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="name" string="Description of Goods/Services"/>
+                <field name="quantity"/>
+                <field name="price_subtotal" string="Value (Excl. Tax)" sum="Total Excl. Tax"/>
+                <field name="zra_line_tax_amount" string="Tax Amount" sum="Total Tax"/>
+                <field name="price_total" string="Value (Incl. Tax)" sum="Total Incl. Tax"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_zra_sales_register_search" model="ir.ui.view">
+        <field name="name">zra.sales.register.search</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <search string="Search ZRA Sales Register">
+                <field name="move_id"/>
+                <field name="partner_id"/>
+                <field name="name"/>
+                <filter string="Invoices" name="invoices" domain="[('move_id.move_type', '=', 'out_invoice')]"/>
+                <filter string="Credit Notes" name="credit_notes" domain="[('move_id.move_type', '=', 'out_refund')]"/>
+                <filter string="This Month" name="this_month"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Customer" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Invoice" name="group_move" context="{'group_by': 'move_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_zra_sales_register" model="ir.actions.act_window">
+        <field name="name">ZRA Sales Register</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[
+            ('move_id.zra_sync_status', '=', 'synced'),
+            ('move_id.move_type', 'in', ['out_invoice', 'out_refund']),
+            ('display_type', '=', 'product'),
+        ]</field>
+        <field name="context">{'search_default_this_month': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No ZRA-synced sales lines yet.
+            </p>
+            <p>
+                Shows every line item from ZRA-fiscalized invoices and credit
+                notes — invoice number, date, customer, description, value
+                and tax amount (checklist #31). Use the Export action
+                (⚙ menu, top-right) for Excel/CSV output (checklist #30).
+            </p>
+        </field>
+    </record>
+
+</odoo>

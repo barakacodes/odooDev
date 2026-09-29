@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_forecourt_tank_company" model="ir.rule">
+        <field name="name">Forecourt Tank: multi-company</field>
+        <field name="model_id" ref="model_forecourt_tank"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_pump_company" model="ir.rule">
+        <field name="name">Forecourt Pump: multi-company</field>
+        <field name="model_id" ref="model_forecourt_pump"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_shift_company" model="ir.rule">
+        <field name="name">Forecourt Shift: multi-company</field>
+        <field name="model_id" ref="model_forecourt_shift"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_sale_company" model="ir.rule">
+        <field name="name">Forecourt Sale: multi-company</field>
+        <field name="model_id" ref="model_forecourt_sale"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_delivery_company" model="ir.rule">
+        <field name="name">Forecourt Delivery: multi-company</field>
+        <field name="model_id" ref="model_forecourt_delivery"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_dip_reading_company" model="ir.rule">
+        <field name="name">Forecourt Dip Reading: multi-company</field>
+        <field name="model_id" ref="model_forecourt_dip_reading"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_meter_reading_company" model="ir.rule">
+        <field name="name">Forecourt Meter Reading: multi-company</field>
+        <field name="model_id" ref="model_forecourt_meter_reading"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_cash_recon_company" model="ir.rule">
+        <field name="name">Forecourt Cash Reconciliation: multi-company</field>
+        <field name="model_id" ref="model_forecourt_cash_reconciliation"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_target_company" model="ir.rule">
+        <field name="name">Forecourt Target: multi-company</field>
+        <field name="model_id" ref="model_forecourt_target"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_forecourt_price_history_company" model="ir.rule">
+        <field name="name">Forecourt Fuel Price History: multi-company</field>
+        <field name="model_id" ref="model_forecourt_fuel_price_history"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_forecourt_credit_customer_company" model="ir.rule">
+        <field name="name">Forecourt Credit Customer: multi-company</field>
+        <field name="model_id" ref="model_forecourt_credit_customer"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_forecourt_credit_transaction_company" model="ir.rule">
+        <field name="name">Forecourt Credit Transaction: multi-company</field>
+        <field name="model_id" ref="model_forecourt_credit_transaction"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

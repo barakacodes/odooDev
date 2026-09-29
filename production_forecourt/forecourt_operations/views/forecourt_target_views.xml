@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_target_list" model="ir.ui.view">
+        <field name="name">forecourt.target.list</field>
+        <field name="model">forecourt.target</field>
+        <field name="arch" type="xml">
+            <list string="Monthly Targets" editable="bottom">
+                <field name="year"/>
+                <field name="month"/>
+                <field name="branch"/>
+                <field name="petrol_volume_target"/>
+                <field name="diesel_volume_target"/>
+                <field name="revenue_target"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_target_form" model="ir.ui.view">
+        <field name="name">forecourt.target.form</field>
+        <field name="model">forecourt.target</field>
+        <field name="arch" type="xml">
+            <form string="Monthly Target">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="branch"/>
+                            <field name="month"/>
+                            <field name="year"/>
+                        </group>
+                        <group>
+                            <field name="petrol_volume_target"/>
+                            <field name="diesel_volume_target"/>
+                            <field name="revenue_target"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_target" model="ir.actions.act_window">
+        <field name="name">Monthly Targets</field>
+        <field name="res_model">forecourt.target</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

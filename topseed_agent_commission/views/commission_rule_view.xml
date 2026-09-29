@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commission_rule_form" model="ir.ui.view">
+        <field name="name">topseed.commission.rule.form</field>
+        <field name="model">topseed.commission.rule</field>
+        <field name="arch" type="xml">
+            <form string="Commission Rule">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="commission_type"/>
+                            <field name="commission_rate" attrs="{'invisible': [('commission_type', '!=', 'percentage')]}"/>
+                            <field name="fixed_amount" attrs="{'invisible': [('commission_type', '!=', 'fixed')]}"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Applicability">
+                        <group string="Products">
+                            <field name="product_ids" widget="many2many_tags"/>
+                            <field name="product_category_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Agents">
+                            <field name="agent_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Tiered Rates" attrs="{'invisible': [('commission_type', '!=', 'tiered')]}">
+                        <group>
+                            <field name="tier1_rate"/>
+                            <field name="tier1_threshold"/>
+                        </group>
+                        <group>
+                            <field name="tier2_rate"/>
+                            <field name="tier2_threshold"/>
+                        </group>
+                        <group>
+                            <field name="tier3_rate"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Minimum Requirements">
+                        <field name="min_sales_amount"/>
+                        <field name="min_quantity"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_commission_rule_tree" model="ir.ui.view">
+        <field name="name">topseed.commission.rule.tree</field>
+        <field name="model">topseed.commission.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Rules">
+                <field name="name"/>
+                <field name="commission_type"/>
+                <field name="commission_rate"/>
+                <field name="min_sales_amount"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_commission_rule" model="ir.actions.act_window">
+        <field name="name">Commission Rules</field>
+        <field name="res_model">topseed.commission.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help">Define commission rules for agents.</field>
+    </record>
+</odoo>

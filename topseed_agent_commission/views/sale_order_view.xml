@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_order_commission_form" model="ir.ui.view">
+        <field name="name">sale.order.commission.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="agent_id" domain="[('is_agent', '=', True)]" 
+                       options="{'no_create': True}"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='order_line']" position="after">
+                <group string="Commission Information" 
+                       attrs="{'invisible': [('commission_total', '=', 0.0)]}">
+                    <group>
+                        <field name="commission_total"/>
+                        <field name="commission_status"/>
+                    </group>
+                    <group>
+                        <button name="action_calculate_commission" string="Calculate Commission" 
+                                type="object" class="btn-secondary"
+                                attrs="{'invisible': [('agent_id', '=', False)]}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

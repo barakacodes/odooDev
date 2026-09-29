@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commission_line_form" model="ir.ui.view">
+        <field name="name">topseed.commission.line.form</field>
+        <field name="model">topseed.commission.line</field>
+        <field name="arch" type="xml">
+            <form string="Commission Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="display_name"/>
+                            <field name="agent_id"/>
+                            <field name="product_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="rule_id"/>
+                        </group>
+                        <group>
+                            <field name="sale_amount"/>
+                            <field name="commission_rate"/>
+                            <field name="commission_amount"/>
+                            <field name="state" widget="statusbar" statusbar_visible="pending,approved,paid"/>
+                            <field name="date"/>
+                            <field name="due_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_commission_line_tree" model="ir.ui.view">
+        <field name="name">topseed.commission.line.tree</field>
+        <field name="model">topseed.commission.line</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Lines">
+                <field name="display_name"/>
+                <field name="agent_id"/>
+                <field name="product_id"/>
+                <field name="sale_amount"/>
+                <field name="commission_amount"/>
+                <field name="state"/>
+                <field name="date"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_commission_line" model="ir.actions.act_window">
+        <field name="name">Commission Lines</field>
+        <field name="res_model">topseed.commission.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help">Track all commission lines.</field>
+    </record>
+</odoo>

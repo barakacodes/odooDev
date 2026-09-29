@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_zra_nightly_backup" model="ir.cron">
+            <field name="name">ZRA: Nightly Database Backup</field>
+            <field name="model_id" ref="model_zra_backup_log"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_nightly_backup()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <!-- No explicit nextcall: defaults to "now" so the first run
+                 (and therefore the first zra.backup.log row proving the
+                 schedule is live) happens right after install/upgrade
+                 rather than waiting up to 24h. From then on it repeats
+                 every interval_number/interval_type — every 24h from
+                 whatever time it first ran, which in practice lands
+                 overnight for any install done during a normal workday. -->
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

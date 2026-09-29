@@ -1,0 +1,10 @@
+﻿id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_topseed_commission_config_user,topseed.commission.config.user,model_topseed_commission_config,group_commission_user,1,0,0,0
+access_topseed_commission_config_manager,topseed.commission.config.manager,model_topseed_commission_config,group_commission_manager,1,1,1,1
+access_topseed_commission_rule_user,topseed.commission.rule.user,model_topseed_commission_rule,group_commission_user,1,0,0,0
+access_topseed_commission_rule_manager,topseed.commission.rule.manager,model_topseed_commission_rule,group_commission_manager,1,1,1,1
+access_topseed_commission_line_user,topseed.commission.line.user,model_topseed_commission_line,group_commission_user,1,0,0,0
+access_topseed_commission_line_manager,topseed.commission.line.manager,model_topseed_commission_line,group_commission_manager,1,1,1,1
+access_topseed_commission_line_agent,topseed.commission.line.agent,model_topseed_commission_line,group_commission_agent,1,0,0,0
+access_topseed_commission_payment_user,topseed.commission.payment.user,model_topseed_commission_payment,group_commission_user,1,0,0,0
+access_topseed_commission_payment_manager,topseed.commission.payment.manager,model_topseed_commission_payment,group_commission_manager,1,1,1,1

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_import_wizard_form" model="ir.ui.view">
+        <field name="name">forecourt.import.wizard.form</field>
+        <field name="model">forecourt.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import WhatsApp Shift Report">
+                <sheet style="width:100%">
+
+                    <!-- STEP 1: paste -->
+                    <div invisible="state != 'draft'">
+                        <div class="alert alert-info" role="alert">
+                            Select the branch and paste the WhatsApp shift report. For multiple reports, enable <b>Bulk Import</b>.
+                        </div>
+                        <group>
+                            <group>
+                                <field name="branch" required="1"/>
+                            </group>
+                            <group>
+                                <field name="bulk_mode" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+                        <field name="report_text" widget="text" nolabel="1"
+                               placeholder="Paste one or more WhatsApp shift reports here..."
+                               style="min-height:280px; width:100%;"/>
+
+                        <div class="alert alert-secondary mt-3" role="alert" invisible="bulk_mode == False">
+                            <b>OR</b> upload the raw WhatsApp export file directly (.txt or .zip
+                            containing _chat.txt) — recommended for real exports with many
+                            messages, since it correctly skips non-report chatter.
+                        </div>
+                        <group invisible="bulk_mode == False">
+                            <field name="report_file" filename="report_filename"/>
+                            <field name="report_filename" invisible="1"/>
+                        </group>
+                    </div>
+
+                    <!-- STEP 2: validated preview -->
+                    <div invisible="state == 'draft'" style="width:100%">
+
+                        <div class="alert alert-success" role="alert" invisible="state != 'validated'">
+                            <i class="fa fa-check-circle me-1"/> <b>Validation Passed</b> — Review the details below and click <b>Import Shift</b>.
+                        </div>
+                        <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                            <i class="fa fa-times-circle me-1"/> <b>Validation Failed</b> — Fix the report text and click <b>Re-validate</b>.
+                        </div>
+                        <div class="alert alert-warning" role="alert" invisible="is_editing != True">
+                            <b>Editing</b> — Fields below are now editable. Click <b>Done Editing</b> when finished, then <b>Import Shift</b>.
+                        </div>
+
+                        <!-- Shift Details -->
+                        <group string="Shift Details" invisible="state != 'validated' or bulk_mode == True">
+                            <group>
+                                <field name="parsed_supervisor" readonly="not is_editing"/>
+                                <field name="parsed_date" readonly="not is_editing"/>
+                            </group>
+                            <group>
+                                <field name="branch" readonly="1"/>
+                                <field name="parsed_shift_type" readonly="not is_editing"/>
+                            </group>
+                        </group>
+
+                        <!-- Fuel Inventory -->
+                        <group string="Fuel Inventory" invisible="state != 'validated' or bulk_mode == True">
+                            <group string="Petrol (ULP)">
+                                <field name="p_opening" readonly="not is_editing"/>
+                                <field name="p_received" readonly="not is_editing"/>
+                                <field name="p_total_sold" readonly="not is_editing"/>
+                                <field name="p_credit" readonly="not is_editing"/>
+                                <field name="p_cash_sales" readonly="not is_editing"/>
+                                <field name="p_closing" readonly="not is_editing"/>
+                            </group>
+                            <group string="Diesel (LSD)">
+                                <field name="d_opening" readonly="not is_editing"/>
+                                <field name="d_received" readonly="not is_editing"/>
+                                <field name="d_total_sold" readonly="not is_editing"/>
+                                <field name="d_credit" readonly="not is_editing"/>
+                                <field name="d_cash_sales" readonly="not is_editing"/>
+                                <field name="d_closing" readonly="not is_editing"/>
+                            </group>
+                        </group>
+
+                        <!-- Cash Summary -->
+                        <group string="Cash Summary" invisible="state != 'validated' or bulk_mode == True">
+                            <group>
+                                <field name="p_fuel_cash" readonly="not is_editing"/>
+                                <field name="p_pos" readonly="not is_editing"/>
+                                <field name="p_cash_at_hand" readonly="not is_editing"/>
+                            </group>
+                            <group>
+                                <field name="p_lubes" readonly="not is_editing"/>
+                                <field name="p_lpg" readonly="not is_editing"/>
+                                <field name="p_loss" readonly="not is_editing"/>
+                            </group>
+                        </group>
+
+                        <!-- Bulk import results -->
+                        <div invisible="bulk_mode == False or not preview_lines"
+                             style="background:#f8f9fa; border:1px solid #dee2e6; padding:16px; margin-bottom:12px; font-family:monospace; font-size:12px; white-space:pre-wrap;">
+                            <field name="preview_lines" widget="text" nolabel="1" readonly="1"
+                                   style="width:100%; border:none; background:transparent; font-family:monospace; font-size:12px;"/>
+                        </div>
+
+                        <!-- Error message -->
+                        <group string="Error Details" invisible="state != 'error' or bulk_mode == True">
+                            <field name="preview_lines" widget="text" nolabel="1" readonly="1"
+                                   style="color:#dc3545; width:100%;"/>
+                        </group>
+
+                        <!-- Original text - hidden by default -->
+                        <div style="margin-top:8px;">
+                            <button name="action_show_original" string="Show Original Report Text"
+                                    type="object" class="btn btn-link btn-sm text-muted"
+                                    invisible="show_original == True"/>
+                            <div invisible="show_original == False">
+                                <field name="report_text" widget="text" nolabel="1" readonly="1"
+                                       style="width:100%; color:#6c757d; font-size:11px; background:#f8f9fa;"/>
+                                <button name="action_hide_original" string="Hide"
+                                        type="object" class="btn btn-link btn-sm text-muted"/>
+                            </div>
+                        </div>
+                    </div>
+
+                </sheet>
+                <footer>
+                    <button name="action_validate" string="Validate" type="object"
+                            class="btn-primary" invisible="state != 'draft' or bulk_mode == True"/>
+                    <button name="action_bulk_import" string="Bulk Import (Pasted Text)" type="object"
+                            class="btn-primary" invisible="state != 'draft' or bulk_mode == False"/>
+                    <button name="action_bulk_import_file" string="Bulk Import (Uploaded File)" type="object"
+                            class="btn-primary" invisible="state != 'draft' or bulk_mode == False"/>
+                    <button name="action_import" string="Import Shift" type="object"
+                            class="btn-success" invisible="state != 'validated'"/>
+                    <button name="action_edit_fields" string="Edit" type="object"
+                            class="btn-secondary" invisible="state != 'validated' or bulk_mode == True or is_editing == True"/>
+                    <button name="action_lock_fields" string="Done Editing" type="object"
+                            class="btn-secondary" invisible="is_editing != True"/>
+                    <button name="action_revalidate" string="Re-validate" type="object"
+                            class="btn-warning" invisible="state == 'draft'"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Shift Report</field>
+        <field name="res_model">forecourt.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_forecourt_import"
+              name="Import Shift Report"
+              parent="forecourt_operations.menu_forecourt_operations"
+              action="forecourt_whatsapp_import.action_forecourt_import_wizard"
+              sequence="5"
+              groups="forecourt_operations.group_forecourt_user"/>
+</odoo>

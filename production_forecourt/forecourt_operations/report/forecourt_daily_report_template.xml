@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_forecourt_daily_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="data"     t-value="docs[0].get_report_values()"/>
+                <t t-set="company"  t-value="data['company']"/>
+                <t t-set="blocks"   t-value="data['blocks']"/>
+
+                <div class="page">
+                    <!-- â”€â”€ Report Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+                    <div style="margin-bottom:8px; line-height:1.6;">
+                        <div><strong style="font-size:14px;" t-esc="company.name"/></div>
+                        <div t-esc="company.street or ''"/>
+                        <div>TPIN: <t t-esc="company.vat or ''"/></div>
+                    </div>
+
+                    <div style="margin-bottom:4px;">
+                        <strong style="font-size:13px;">Daily Sales Report</strong>
+                    </div>
+                    <div style="margin-bottom:2px; font-size:10px;">
+                        Date: <strong><t t-esc="data['report_date'].strftime('%d %B %Y')"/></strong>
+                        &#160;&#160;|&#160;&#160;
+                        Branch: <strong><t t-esc="data['branch_label']"/></strong>
+                        &#160;&#160;|&#160;&#160;
+                        Shift: <strong><t t-esc="data['shift_label']"/></strong>
+                        &#160;&#160;|&#160;&#160;
+                        Section: <strong><t t-esc="data['section_label']"/></strong>
+                    </div>
+
+                    <hr style="margin:8px 0;"/>
+
+                    <!-- â”€â”€ No data message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+                    <t t-if="not blocks">
+                        <p style="font-style:italic; color:#888;">
+                            No shifts found for the selected filters.
+                        </p>
+                    </t>
+
+                    <!-- â”€â”€ One block per shift â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+                    <t t-foreach="blocks" t-as="block">
+
+                        <!-- Shift title bar -->
+                        <div style="background:#1F497D; color:#fff; padding:5px 8px;
+                                    font-weight:bold; font-size:10px; margin-top:12px;">
+                            <t t-esc="block['branch_label']"/> &#8212;
+                            <t t-esc="block['shift_label']"/>
+                            &#160;&#160;|&#160;&#160;
+                            Shift Ref: <t t-esc="block['shift']['name']"/>
+                            &#160;&#160;|&#160;&#160;
+                            Supervisor: <t t-esc="block['shift']['supervisor_id']['name']"/>
+                        </div>
+
+                        <!-- â”€â”€ Fuel: per-product stock table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+                        <t t-if="block['section'] == 'fuel' and block['product_lines']">
+                            <table style="width:60%; border-collapse:collapse;
+                                          font-size:9px; margin-top:6px;">
+                                <thead>
+                                    <tr style="background:#D9D9D9; font-weight:bold; text-align:center;">
+                                        <th style="border:1px solid #000; padding:3px; width:40%;">Product</th>
+                                        <th style="border:1px solid #000; padding:3px; width:20%;">Opening Stock (L)</th>
+                                        <th style="border:1px solid #000; padding:3px; width:20%;">Received (L)</th>
+                                        <th style="border:1px solid #000; padding:3px; width:20%;">Closing Stock (L)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="block['product_lines']" t-as="pl">
+                                        <tr>
+                                            <td style="border:1px solid #000; padding:3px;" t-esc="pl['product']"/>
+                                            <td style="border:1px solid #000; padding:3px; text-align:right;">
+                                                <t t-esc="'%.3f' % pl['opening_stock']"/>
+                                            </td>
+                                            <td style="border:1px solid #000; padding:3px; text-align:right;">
+                                                <t t-esc="'%.3f' % pl['received']"/>
+                                            </td>
+                                            <td style="border:1px solid #000; padding:3px; text-align:right;">
+                                                <t t-esc="'%.3f' % pl['closing_stock']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- â”€â”€ Main summary table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+                        <table style="width:70%; border-collapse:collapse;
+                                      font-size:9px; margin-top:8px;">
+
+                            <!-- Litres sold -->
+                            <tr style="background:#E2EFDA;">
+                                <td style="border:1px solid #999; padding:4px; font-weight:bold; width:60%;">
+                                    Total Litres Sold
+                                </td>
+                                <td style="border:1px solid #999; padding:4px; text-align:right; font-weight:bold;">
+                                    <t t-esc="'%.3f' % block['total_litres_sold']"/> L
+                                </td>
+                            </tr>
+                            <t t-if="block['section'] == 'fuel'">
+                                <tr>
+                                    <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                        Cash Sales (litres)
+                                    </td>
+                                    <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                        <t t-esc="'%.3f' % block['cash_litres']"/> L
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                        Card Sales (litres)
+                                    </td>
+                                    <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                        <t t-esc="'%.3f' % block['card_litres']"/> L
+                                    </td>
+                                </tr>
+                            </t>
+
+                            <!-- Revenue -->
+                            <tr style="background:#E2EFDA; margin-top:2px;">
+                                <td style="border:1px solid #999; padding:4px; font-weight:bold;">
+                                    Total Sales Revenue
+                                </td>
+                                <td style="border:1px solid #999; padding:4px; text-align:right; font-weight:bold;">
+                                    ZMW <t t-esc="'%.2f' % block['total_revenue']"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                    Cash Sales (ZMW)
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    ZMW <t t-esc="'%.2f' % block['cash_sales_amount']"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                    Card Sales (ZMW)
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    ZMW <t t-esc="'%.2f' % block['card_sales_amount']"/>
+                                </td>
+                            </tr>
+
+                            <!-- Spacer -->
+                            <tr><td colspan="2" style="padding:2px;"></td></tr>
+
+                            <!-- Wallet customers -->
+                            <tr style="background:#FFF2CC;">
+                                <td style="border:1px solid #999; padding:4px; font-weight:bold;" colspan="2">
+                                    Wallet Customers
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                    Prepaid â€” Litres Withdrawn
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    <t t-esc="'%.3f' % block['prepaid_litres']"/> L
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                    Prepaid â€” Amount Expected (ZMW)
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    ZMW <t t-esc="'%.2f' % block['prepaid_amount']"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                    Account Holders â€” Litres Withdrawn
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    <t t-esc="'%.3f' % block['account_litres']"/> L
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:3px 4px 3px 20px;">
+                                    Account Holders â€” Amount Expected (ZMW)
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    ZMW <t t-esc="'%.2f' % block['account_amount']"/>
+                                </td>
+                            </tr>
+
+                            <!-- Spacer -->
+                            <tr><td colspan="2" style="padding:2px;"></td></tr>
+
+                            <!-- Test fuel + deliveries -->
+                            <tr style="background:#DDEBF7;">
+                                <td style="border:1px solid #ccc; padding:3px 4px;">
+                                    Test / Calibration Fuel Used
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    <t t-esc="'%.3f' % block['test_litres']"/> L
+                                </td>
+                            </tr>
+                            <tr style="background:#DDEBF7;">
+                                <td style="border:1px solid #ccc; padding:3px 4px;">
+                                    Fuel Received During Shift
+                                </td>
+                                <td style="border:1px solid #ccc; padding:3px; text-align:right;">
+                                    <t t-esc="'%.3f' % block['received_litres']"/> L
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </t>
+                    <!-- â”€â”€ Signature â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+                    <div style="margin-top:30px; display:flex; gap:80px; font-size:9px;">
+                        <div>Prepared By: _______________________________</div>
+                        <div>Verified By: ________________________________</div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

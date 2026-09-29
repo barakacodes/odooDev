@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_shift_form_capture" model="ir.ui.view">
+        <field name="name">forecourt.shift.form.capture</field>
+        <field name="model">forecourt.shift</field>
+        <field name="inherit_id" ref="forecourt_operations.view_forecourt_shift_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_seed_fuel_entries"
+                        string="Add Petrol &amp; Diesel Rows"
+                        type="object" class="btn-secondary"
+                        invisible="fuel_entry_ids"/>
+                <field name="capture_status" widget="badge"
+                       decoration-success="capture_status == 'ok'"
+                       decoration-danger="capture_status == 'mismatch'"
+                       decoration-muted="capture_status == 'na'"/>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='sales']" position="before">
+                <page string="Shift Capture" name="shift_capture">
+
+                    <group string="Fuel Entries (Petrol &amp; Diesel)">
+                        <field name="fuel_entry_ids" nolabel="1">
+                            <list editable="bottom" create="1" delete="1">
+                                <field name="fuel_type"/>
+                                <field name="opening_stock_litres"/>
+                                <field name="received_stock_litres"/>
+                                <field name="total_sold_litres"/>
+                                <field name="derived_sold_litres" readonly="1"/>
+                                <field name="report_consistency_variance" readonly="1"/>
+                                <field name="report_consistency_status" widget="badge"
+                                       decoration-success="report_consistency_status == 'ok'"
+                                       decoration-danger="report_consistency_status == 'mismatch'"/>
+                                <field name="credit_litres_sold"/>
+                                <field name="coupon_litres_sold"/>
+                                <field name="cash_sales_litres"/>
+                                <field name="test_stock_litres"/>
+                                <field name="closing_stock_litres"/>
+                                <field name="atg_closing_stock_litres"/>
+                                <field name="atg_gain_loss_litres"/>
+                                <field name="dip_gain_loss_litres"/>
+                                <field name="rate" readonly="1"/>
+                                <field name="cash_sales_value" readonly="1" sum="Cash Sales (K)"/>
+                                <field name="opening_check_status" widget="badge"
+                                       decoration-success="opening_check_status == 'ok'"
+                                       decoration-danger="opening_check_status == 'mismatch'"
+                                       decoration-muted="opening_check_status == 'na'"/>
+                                <field name="closing_check_status" widget="badge"
+                                       decoration-success="closing_check_status == 'ok'"
+                                       decoration-danger="closing_check_status == 'mismatch'"/>
+                                <field name="atg_dip_check_status" widget="badge"
+                                       decoration-success="atg_dip_check_status == 'ok'"
+                                       decoration-danger="atg_dip_check_status == 'mismatch'"
+                                       decoration-muted="atg_dip_check_status == 'na'"/>
+                            </list>
+                            <form string="Fuel Entry">
+                                <sheet>
+                                    <group>
+                                        <group string="Identification">
+                                            <field name="fuel_type"/>
+                                            <field name="shift_date" readonly="1"/>
+                                            <field name="branch" readonly="1"/>
+                                            <field name="rate" readonly="1"/>
+                                        </group>
+                                        <group string="Sales (Litres)">
+                                            <field name="total_sold_litres"/>
+                                            <field name="credit_litres_sold"/>
+                                            <field name="coupon_litres_sold"/>
+                                            <field name="cash_sales_litres"/>
+                                            <field name="test_stock_litres"/>
+                                            <field name="cash_sales_value" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <group string="Stocks (Litres)">
+                                            <field name="opening_stock_litres"/>
+                                            <field name="received_stock_litres"/>
+                                            <field name="closing_stock_litres"/>
+                                            <field name="atg_closing_stock_litres"/>
+                                        </group>
+                                        <group string="Gain / Loss (Litres)">
+                                            <field name="atg_gain_loss_litres"/>
+                                            <field name="dip_gain_loss_litres"/>
+                                        </group>
+                                    </group>
+                                    <group string="Reconciliation" col="3">
+                                        <group>
+                                            <field name="system_opening_litres" readonly="1"/>
+                                            <field name="opening_variance" readonly="1"/>
+                                            <field name="opening_check_status" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="derived_sold_litres" readonly="1"/>
+                                            <field name="report_consistency_variance" readonly="1"/>
+                                            <field name="report_consistency_status" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="expected_closing_litres" readonly="1"/>
+                                            <field name="closing_variance" readonly="1"/>
+                                            <field name="closing_variance_literal" readonly="1"/>
+                                            <field name="closing_check_status" readonly="1"/>
+                                        </group>
+                                        <group>
+                                            <field name="atg_dip_variance" readonly="1"/>
+                                            <field name="atg_dip_check_status" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <field name="notes"/>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </field>
+                    </group>
+
+                    <group>
+                        <group string="Cash &amp; POS (Kwacha)">
+                            <field name="cash_on_hand_kwacha"/>
+                            <field name="pos_account_kwacha"/>
+                            <field name="lube_sales_kwacha"/>
+                            <field name="lpg_sales_kwacha"/>
+                        </group>
+                        <group string="Cash Reconciliation (Rule 4)" readonly="1">
+                            <field name="expected_cash_minus_pos"/>
+                            <field name="cash_check_variance"/>
+                            <field name="cash_check_status" widget="badge"
+                                   decoration-success="cash_check_status == 'ok'"
+                                   decoration-danger="cash_check_status == 'mismatch'"
+                                   decoration-muted="cash_check_status == 'na'"/>
+                        </group>
+                    </group>
+
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_forecourt_shift_list_capture" model="ir.ui.view">
+        <field name="name">forecourt.shift.list.capture</field>
+        <field name="model">forecourt.shift</field>
+        <field name="inherit_id" ref="forecourt_operations.view_forecourt_shift_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <field name="capture_status" widget="badge"
+                       decoration-success="capture_status == 'ok'"
+                       decoration-danger="capture_status == 'mismatch'"
+                       decoration-muted="capture_status == 'na'"
+                       optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_forecourt_shift_fuel_entry_list" model="ir.ui.view">
+        <field name="name">forecourt.shift.fuel.entry.list</field>
+        <field name="model">forecourt.shift.fuel.entry</field>
+        <field name="arch" type="xml">
+            <list string="Shift Fuel Entries" default_order="shift_date desc, fuel_type">
+                <field name="shift_date"/>
+                <field name="branch"/>
+                <field name="shift_id"/>
+                <field name="fuel_type"/>
+                <field name="opening_stock_litres" sum="Opening"/>
+                <field name="total_sold_litres" sum="Sold"/>
+                <field name="coupon_litres_sold" sum="Coupon"/>
+                <field name="derived_sold_litres" sum="Derived Sold"/>
+                <field name="report_consistency_variance" sum="Report Diff"/>
+                <field name="report_consistency_status" widget="badge"
+                       decoration-success="report_consistency_status == 'ok'"
+                       decoration-danger="report_consistency_status == 'mismatch'"/>
+                <field name="closing_stock_litres" sum="Closing"/>
+                <field name="opening_variance" sum="Open Var"/>
+                <field name="closing_variance" sum="Close Var"/>
+                <field name="atg_dip_variance" sum="ATG Var"/>
+                <field name="opening_check_status" widget="badge"
+                       decoration-success="opening_check_status == 'ok'"
+                       decoration-danger="opening_check_status == 'mismatch'"
+                       decoration-muted="opening_check_status == 'na'"/>
+                <field name="closing_check_status" widget="badge"
+                       decoration-success="closing_check_status == 'ok'"
+                       decoration-danger="closing_check_status == 'mismatch'"/>
+                <field name="atg_dip_check_status" widget="badge"
+                       decoration-success="atg_dip_check_status == 'ok'"
+                       decoration-danger="atg_dip_check_status == 'mismatch'"
+                       decoration-muted="atg_dip_check_status == 'na'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_shift_fuel_entry_search" model="ir.ui.view">
+        <field name="name">forecourt.shift.fuel.entry.search</field>
+        <field name="model">forecourt.shift.fuel.entry</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="shift_id"/>
+                <field name="shift_date"/>
+                <filter name="petrol" string="Petrol" domain="[('fuel_type','=','petrol')]"/>
+                <filter name="diesel" string="Diesel" domain="[('fuel_type','=','diesel')]"/>
+                <separator/>
+                <filter name="report_inconsistent" string="Report Inconsistent"
+                        domain="[('report_consistency_status','=','mismatch')]"/>
+                <filter name="opening_mismatch" string="Opening Mismatch"
+                        domain="[('opening_check_status','=','mismatch')]"/>
+                <filter name="closing_mismatch" string="Closing Mismatch"
+                        domain="[('closing_check_status','=','mismatch')]"/>
+                <filter name="atg_dip_mismatch" string="ATG Mismatch"
+                        domain="[('atg_dip_check_status','=','mismatch')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_branch" string="Branch"
+                            context="{'group_by': 'branch'}"/>
+                    <filter name="group_fuel" string="Fuel"
+                            context="{'group_by': 'fuel_type'}"/>
+                    <filter name="group_date" string="Date"
+                            context="{'group_by': 'shift_date'}"/>
+                    <filter name="group_report_consistency" string="Report Consistency"
+                            context="{'group_by': 'report_consistency_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_forecourt_shift_fuel_entry" model="ir.actions.act_window">
+        <field name="name">Shift Fuel Entries</field>
+        <field name="res_model">forecourt.shift.fuel.entry</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_forecourt_shift_fuel_entry_search"/>
+    </record>
+</odoo>

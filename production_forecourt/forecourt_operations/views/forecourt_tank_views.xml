@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_tank_list" model="ir.ui.view">
+        <field name="name">forecourt.tank.list</field>
+        <field name="model">forecourt.tank</field>
+        <field name="arch" type="xml">
+            <list string="Tanks" decoration-danger="stock_status=='critical'"
+                  decoration-warning="stock_status=='low'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="warehouse_id"/>
+                <field name="capacity"/>
+                <field name="current_level"/>
+                <field name="level_percentage" string="Level %"
+                       widget="progressbar"/>
+                <field name="reorder_level"/>
+                <field name="stock_status" widget="badge"
+                       decoration-danger="stock_status=='critical'"
+                       decoration-warning="stock_status=='low'"
+                       decoration-success="stock_status=='ok'"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_tank_form" model="ir.ui.view">
+        <field name="name">forecourt.tank.form</field>
+        <field name="model">forecourt.tank</field>
+        <field name="arch" type="xml">
+            <form string="Fuel Storage Tank">
+                <header>
+                    <field name="stock_status" widget="statusbar"
+                           statusbar_visible="ok,low,critical"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Tank Name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Tank Details">
+                            <field name="code"/>
+                            <field name="product_id"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Capacity &amp; Levels">
+                            <field name="capacity"/>
+                            <field name="current_level"/>
+                            <field name="level_percentage" widget="progressbar"/>
+                            <field name="reorder_level"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes…"/>
+                    <notebook>
+                        <page string="Dip Readings" name="dips">
+                            <field name="dip_ids" readonly="1">
+                                <list>
+                                    <field name="reading_datetime"/>
+                                    <field name="reading_type"/>
+                                    <field name="dip_mm"/>
+                                    <field name="litres"/>
+                                    <field name="recorded_by"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Deliveries" name="deliveries">
+                            <field name="delivery_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="delivery_date"/>
+                                    <field name="quantity_received"/>
+                                    <field name="supplier_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state=='received'"
+                                           decoration-warning="state=='draft'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_tank" model="ir.actions.act_window">
+        <field name="name">Tanks</field>
+        <field name="res_model">forecourt.tank</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

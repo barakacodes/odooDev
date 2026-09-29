@@ -1,0 +1,320 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mail_bot
+#
+# Translators:
+# Wil Odoo, 2023
+# Tony Ng, 2024
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-29 18:37+0000\n"
+"PO-Revision-Date: 2026-08-07 17:39+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-17/mail_bot/zh_Hant/>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Aaaaaw that's really cute but, you know, bots don't work that way. You're "
+"too human for me! Let's keep it professional ❤️"
+msgstr ""
+"哈哈，那真的很可愛，但是，您知道，機器人不是這樣工作的。您對我來說太人性化了"
+"！讓我們保持專業 ❤️"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__disabled
+msgid "Disabled"
+msgstr "停用"
+
+#. module: mail_bot
+#: model:ir.model,name:mail_bot.model_discuss_channel
+msgid "Discussion Channel"
+msgstr "討論群組"
+
+#. module: mail_bot
+#: model:ir.model,name:mail_bot.model_mail_thread
+msgid "Email Thread"
+msgstr "電郵對話串"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Great! 👍<br/>To access special commands, <b>start your sentence with</b> "
+"<span class=\"o_odoobot_command\">/</span>. Try getting help."
+msgstr ""
+"太棒了！ 👍<br/>若要使用特殊命令，<b>請以</b><span "
+"class=\"o_odoobot_command\">/</span>開頭。嘗試/help。"
+
+#. module: mail_bot
+#: model:ir.model,name:mail_bot.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTP 路由"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/res_users.py:0
+#, python-format
+msgid "Hello,"
+msgstr "您好!"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "Hmmm..."
+msgstr "嗯..."
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"I am a simple bot, but if that's a dog, he is the cutest 😊 <br/"
+">Congratulations, you finished this tour. You can now <b>close this "
+"conversation</b> or start the tour again with typing <span "
+"class=\"o_odoobot_command\">start the tour</span>. Enjoy discovering Odoo!"
+msgstr ""
+"我是一個簡單的機器人，但如果那是一隻狗，牠會是最可愛的 😊 <br/>恭喜你完成本次"
+"導覽。你現在可以<b>關閉此對話</b>，或輸入「<span class=\"o_odoobot_command\">"
+"start the tour</span>」重新開始導覽。希望你享受探索 Odoo 功能的樂趣！"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "I'm afraid I don't understand. Sorry!"
+msgstr "抱歉我還是不能理解. 對不起!"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"I'm not smart enough to answer your question.<br/>To follow my guide, ask: "
+"<span class=\"o_odoobot_command\">start the tour</span>."
+msgstr ""
+"我不夠聰明，無法回答你的問題。<br/>要跟隨我的嚮導，請詢問：<span "
+"class=\"o_odoobot_command\">start the tour</span>。"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__idle
+msgid "Idle"
+msgstr "閒置"
+
+#. module: mail_bot
+#: model:ir.model,name:mail_bot.model_mail_bot
+msgid "Mail Bot"
+msgstr "信件機器人"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Not exactly. To continue the tour, send an emoji: <b>type</b> <span "
+"class=\"o_odoobot_command\">:)</span> and press enter."
+msgstr ""
+"不完全是。要繼續導覽，請發送表情符號：<b>輸入</b><span "
+"class=\"o_odoobot_command\">:)</span>並按 Enter。"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__not_initialized
+msgid "Not initialized"
+msgstr "未初始化"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Not sure what you are doing. Please, type <span class=\"o_odoobot_command\">/"
+"</span> and wait for the propositions. Select <span "
+"class=\"o_odoobot_command\">help</span> and press enter"
+msgstr ""
+"不肯定你想做甚麼。請鍵入「<span class=\"o_odoobot_command\">/</span>」並等待"
+"建議顯示，選取「<span class=\"o_odoobot_command\">幫助</span>」，然後按輸入鍵"
+"。"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/res_users.py:0
+#, python-format
+msgid ""
+"Odoo's chat helps employees collaborate efficiently. I'm here to help you "
+"discover its features."
+msgstr "Odoo 的聊天功能可協助員工有效率地協作。我會幫助你發現它的功能。"
+
+#. module: mail_bot
+#: model:ir.model.fields,field_description:mail_bot.field_res_users__odoobot_state
+msgid "OdooBot Status"
+msgstr "OdooBot 狀態"
+
+#. module: mail_bot
+#: model:ir.model.fields,field_description:mail_bot.field_res_users__odoobot_failed
+msgid "Odoobot Failed"
+msgstr "Odoobot 操作失敗"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__onboarding_attachement
+msgid "Onboarding attachment"
+msgstr "新手簡介附件"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__onboarding_command
+msgid "Onboarding command"
+msgstr "新手簡介指令"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__onboarding_emoji
+msgid "Onboarding emoji"
+msgstr "新手簡介表情符號"
+
+#. module: mail_bot
+#: model:ir.model.fields.selection,name:mail_bot.selection__res_users__odoobot_state__onboarding_ping
+msgid "Onboarding ping"
+msgstr "新手簡介 ping 網絡測試"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Sorry I'm sleepy. Or not! Maybe I'm just trying to hide my unawareness of "
+"human language...<br/>I can show you features if you write: <span "
+"class=\"o_odoobot_command\">start the tour</span>."
+msgstr ""
+"對不起，我睡著了。歐不！也許我只是想掩飾我對人類語言的不了解...<br/><span "
+"class=\"o_odoobot_command\">如果您寫：開始導覽，</span>我可以向您展示功能。"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Sorry, I am not listening. To get someone's attention, <b>ping him</b>. "
+"Write <span class=\"o_odoobot_command\">@OdooBot</span> and select me."
+msgstr ""
+"對不起，我不聽。要引起某人的注意，請<b>ping 他</b>。寫<span "
+"class=\"o_odoobot_command\">@OdooBot</span>並選擇我。"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "That's not nice! I'm a bot but I have feelings... 💔"
+msgstr "這讓我感覺藍瘦香菇，我雖然是機器人但...我也有知覺💔"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"To <b>send an attachment</b>, click on the <i class=\"fa fa-paperclip\" aria-"
+"hidden=\"true\"></i> icon and select a file."
+msgstr ""
+"要<b>發送附件</b>，請點選<i class=\"fa fa-paperclip\" aria-hidden=\"true\"></"
+"i>圖示並選擇一個文件。"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "To start, try to send me an emoji :)"
+msgstr "開始，嘗試發給我一個笑臉 :)"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/res_users.py:0
+#, python-format
+msgid "Try to send me an emoji"
+msgstr "試試向我發送表情符號"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Unfortunately, I'm just a bot 😞 I don't understand! If you need help "
+"discovering our product, please check <a href=\"https://www.odoo.com/"
+"documentation\" target=\"_blank\">our documentation</a> or <a href=\"https://"
+"www.odoo.com/slides\" target=\"_blank\">our videos</a>."
+msgstr ""
+"不幸的是，我只是一個機器人😞我不明白！如果您在發現我們的產品時需要幫助，請查"
+"看<a href=\"https://www.odoo.com/documentation\" target=\"_blank\">我們的檔"
+"案</a>或<a href=\"https://www.odoo.com/slides\" target=\"_blank\">影片教學</"
+"a>。"
+
+#. module: mail_bot
+#: model:ir.model,name:mail_bot.model_res_users
+msgid "User"
+msgstr "使用者"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Wow you are a natural!<br/>Ping someone with @username to grab their "
+"attention. <b>Try to ping me using</b> <span "
+"class=\"o_odoobot_command\">@OdooBot</span> in a sentence."
+msgstr ""
+"哇，你是個天才！<br/>用@username 某人以引起他們的注意。嘗試在一個句子中<span "
+"class=\"o_odoobot_command\">使用 @OdooBot</span> <b>ping 我。</b>"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid ""
+"Yep, I am here! 🎉 <br/>Now, try <b>sending an attachment</b>, like a "
+"picture of your cute dog..."
+msgstr "沒錯，我來了！ 🎉<br/>現在，嘗試<b>發送附件</b>，例如您可愛的狗的照片..."
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "fuck"
+msgstr "嘖嘖!"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "help"
+msgstr "幫助"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "i love you"
+msgstr "我愛你"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "love"
+msgstr "愛"
+
+#. module: mail_bot
+#. odoo-python
+#: code:addons/mail_bot/models/mail_bot.py:0
+#, python-format
+msgid "start the tour"
+msgstr "開始導覽"

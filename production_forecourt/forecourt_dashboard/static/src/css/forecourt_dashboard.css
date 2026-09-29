@@ -1,0 +1,1227 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Aziz Petroleum · Forecourt Operations Console
+   Premium Light / Dark Adaptive Theme
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Brand palette — Light */
+  --fc-navy:        #0F2942;
+  --fc-navy-2:      #1E4976;
+  --fc-teal:        #0E7C86;
+  --fc-teal-2:      #14A3AF;
+  --fc-gold:        #C9A961;
+  --fc-gold-2:      #E0C486;
+
+  /* Semantic */
+  --fc-success:     #059669;
+  --fc-warning:     #D97706;
+  --fc-danger:      #DC2626;
+  --fc-info:        #0891B2;
+
+  /* Chart palette */
+  --ch-1: #0F2942; --ch-2: #1E4976; --ch-3: #4A6FA5;
+  --ch-4: #0E7C86; --ch-5: #14A3AF; --ch-6: #C9A961;
+  --ch-7: #E0C486; --ch-8: #E76F51; --ch-9: #7FA88A;
+
+  /* Surfaces — Light */
+  --bg-app:         #F5F7FB;
+  --bg-surface:     #FFFFFF;
+  --bg-surface-2:   #FAFBFE;
+  --bg-elevated:    #FFFFFF;
+  --bg-hover:       #F1F5F9;
+  --border-subtle:  #E5E9F0;
+  --border-strong:  #CBD5E1;
+  --divider:        #EDF1F7;
+
+  /* Text — Light */
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
+  --text-inverse:   #FFFFFF;
+
+  /* Effects */
+  --shadow-xs:  0 1px 2px rgba(15, 41, 66, 0.04);
+  --shadow-sm:  0 1px 3px rgba(15, 41, 66, 0.06), 0 1px 2px rgba(15, 41, 66, 0.04);
+  --shadow-md:  0 4px 12px rgba(15, 41, 66, 0.08), 0 2px 4px rgba(15, 41, 66, 0.04);
+  --shadow-lg:  0 12px 32px rgba(15, 41, 66, 0.12), 0 4px 12px rgba(15, 41, 66, 0.06);
+  --shadow-xl:  0 24px 48px rgba(15, 41, 66, 0.16);
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+}
+
+/* ─── DARK MODE ───────────────────────────────────────────────────── */
+body.fc-dark-mode {
+  --fc-navy:        #38BDF8;
+  --fc-navy-2:      #7DD3FC;
+  --fc-teal:        #2DD4BF;
+  --fc-teal-2:      #5EEAD4;
+  --fc-gold:        #FBBF24;
+  --fc-gold-2:      #FCD34D;
+
+  --fc-success:     #34D399;
+  --fc-warning:     #FBBF24;
+  --fc-danger:      #F87171;
+  --fc-info:        #22D3EE;
+
+  --ch-1: #38BDF8; --ch-2: #7DD3FC; --ch-3: #93C5FD;
+  --ch-4: #2DD4BF; --ch-5: #5EEAD4; --ch-6: #FBBF24;
+  --ch-7: #FCD34D; --ch-8: #F87171; --ch-9: #A3D9A5;
+
+  --bg-app:         #0A0E1A;
+  --bg-surface:     #111827;
+  --bg-surface-2:   #1A2332;
+  --bg-elevated:    #1F2937;
+  --bg-hover:       #1F2937;
+  --border-subtle:  #1F2937;
+  --border-strong:  #374151;
+  --divider:        #1A2332;
+
+  --text-primary:   #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --text-muted:     #94A3B8;
+  --text-inverse:   #0A0E1A;
+
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg:  0 12px 32px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-xl:  0 24px 48px rgba(0, 0, 0, 0.7);
+}
+
+/* ─── BASE ────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ODOO SCROLL FIX
+   ═══════════════════════════════════════════════════════════════════ */
+.o_action_manager:has(.fc_dashboard) {
+  overflow: auto !important;
+  height: 100% !important;
+}
+
+.o_action:has(.fc_dashboard) {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+.o_action_manager.fc_dashboard_wrapper {
+  overflow: auto !important;
+  height: 100% !important;
+}
+
+.fc_dashboard_wrapper > .o_action,
+.fc_dashboard_wrapper .o_action:first-child {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+/* ─── DASHBOARD ROOT ──────────────────────────────────────────────── */
+.fc_dashboard {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  min-height: 100%;
+  width: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HERO HEADER
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_hero {
+  position: relative;
+  background: linear-gradient(135deg, #0F2942 0%, #1E4976 50%, #0E7C86 100%);
+  color: #FFFFFF;
+  padding: 22px 28px;
+  min-height: 88px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  overflow: visible;
+  box-shadow: 0 4px 16px rgba(15, 41, 66, 0.18);
+}
+
+body.fc-dark-mode .fc_hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #134E4A 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.fc_brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.fc_brand_logo {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #C9A961 0%, #E0C486 100%);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 22px;
+  color: #0F2942 !important;
+  box-shadow: 0 6px 18px rgba(201, 169, 97, 0.4);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.fc_brand_text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.fc_brand_title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: #FFFFFF !important;
+  white-space: nowrap;
+}
+
+.fc_brand_sub {
+  font-size: 0.72rem;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: 500;
+  color: #FFFFFF !important;
+  white-space: nowrap;
+}
+
+.fc_hero_actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 2;
+  margin-left: auto;
+}
+
+.fc_live_badge {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #FFFFFF !important;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.fc_live_dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ADE80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+  animation: fc_pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes fc_pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+  70%  { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+.fc_icon_btn {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #FFFFFF !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  padding: 0 !important;
+  line-height: 1;
+}
+
+.fc_icon_btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.fc_icon_btn.active {
+  background: #C9A961 !important;
+  color: #0F2942 !important;
+  border-color: #C9A961 !important;
+  box-shadow: 0 4px 12px rgba(201, 169, 97, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FILTER BAR
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_filters {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-xs);
+  transition: background 0.3s ease;
+}
+
+.fc_filter_group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fc_filter_label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fc_filter_input {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  min-width: 130px;
+  transition: all 0.2s ease;
+}
+
+.fc_filter_input:focus {
+  outline: none;
+  border-color: var(--fc-navy);
+  box-shadow: 0 0 0 3px rgba(15, 41, 66, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   KPI GRID
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_kpi_grid {
+  padding: 24px 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.fc_kpi {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 14px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.fc_kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--fc-navy);
+  transition: height 0.3s ease;
+}
+
+.fc_kpi:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+}
+
+.fc_kpi:hover::before { height: 5px; }
+
+.fc_kpi--cash::before     { background: linear-gradient(90deg, var(--ch-1), var(--ch-2)); }
+.fc_kpi--credit::before   { background: linear-gradient(90deg, var(--ch-6), var(--ch-7)); }
+.fc_kpi--deposits::before { background: linear-gradient(90deg, var(--ch-4), var(--ch-5)); }
+.fc_kpi--stockvar::before { background: linear-gradient(90deg, var(--fc-warning), #F59E0B); }
+.fc_kpi--cashvar::before  { background: linear-gradient(90deg, var(--fc-danger), #EF4444); }
+
+.fc_kpi_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.fc_kpi_label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fc_kpi_icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.fc_kpi--cash .fc_kpi_icon     { background: rgba(15, 41, 66, 0.08); color: var(--fc-navy); }
+.fc_kpi--credit .fc_kpi_icon   { background: rgba(201, 169, 97, 0.15); color: var(--fc-gold); }
+.fc_kpi--deposits .fc_kpi_icon { background: rgba(14, 124, 134, 0.1); color: var(--fc-teal); }
+.fc_kpi--stockvar .fc_kpi_icon { background: rgba(217, 119, 6, 0.1); color: var(--fc-warning); }
+.fc_kpi--cashvar .fc_kpi_icon  { background: rgba(220, 38, 38, 0.1); color: var(--fc-danger); }
+
+body.fc-dark-mode .fc_kpi--cash .fc_kpi_icon     { background: rgba(56, 189, 248, 0.15); }
+body.fc-dark-mode .fc_kpi--credit .fc_kpi_icon   { background: rgba(251, 191, 36, 0.15); }
+body.fc-dark-mode .fc_kpi--deposits .fc_kpi_icon { background: rgba(45, 212, 191, 0.15); }
+
+.fc_kpi_value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 6px;
+}
+
+.fc_kpi_value--pos { color: var(--fc-success); }
+.fc_kpi_value--neg { color: var(--fc-danger); }
+
+.fc_kpi_meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fc_kpi_sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.fc_kpi_spark {
+  width: 70px;
+  height: 26px;
+  position: relative;
+}
+
+.fc_kpi_spark canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.fc_kpi_trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.fc_kpi_trend--up   { background: rgba(5, 150, 105, 0.12); color: var(--fc-success); }
+.fc_kpi_trend--down { background: rgba(220, 38, 38, 0.12); color: var(--fc-danger); }
+.fc_kpi_trend--flat { background: var(--bg-hover); color: var(--text-muted); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABS
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_tabs_wrap {
+  padding: 0 28px 28px;
+}
+
+.fc_tabs_nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  margin-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+  box-shadow: var(--shadow-xs);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Thin visible scrollbar so users know the tab row can scroll */
+.fc_tabs_nav::-webkit-scrollbar {
+  height: 6px;
+}
+.fc_tabs_nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.fc_tabs_nav::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+.fc_tabs_nav::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.fc_tab {
+  flex-shrink: 0;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.fc_tab i { font-size: 13px; opacity: 0.8; }
+
+.fc_tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.fc_tab.active {
+  background: linear-gradient(135deg, var(--fc-navy) 0%, var(--fc-navy-2) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(15, 41, 66, 0.25);
+}
+
+body.fc-dark-mode .fc_tab.active {
+  background: linear-gradient(135deg, var(--fc-teal) 0%, var(--fc-teal-2) 100%);
+  color: #0A0E1A;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PANELS
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: visible;
+  box-shadow: var(--shadow-sm);
+  animation: fc_fade_in 0.4s ease;
+  transition: background 0.3s ease;
+}
+
+@keyframes fc_fade_in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fc_panel_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--divider);
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.fc_panel_title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.fc_panel_title i {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-hover);
+  color: var(--fc-navy);
+  font-size: 12px;
+}
+
+body.fc-dark-mode .fc_panel_title i { color: var(--fc-teal); }
+
+.fc_chart_area {
+  height: 340px;
+  padding: 22px 22px 10px;
+  position: relative;
+}
+
+.fc_table_wrap {
+  padding: 0 22px 22px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLES
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.84rem;
+}
+
+.fc_table thead th {
+  background: var(--bg-surface-2);
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.fc_table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s ease;
+}
+
+.fc_table tbody tr:hover td { background: var(--bg-hover); }
+.fc_table tbody tr:last-child td { border-bottom: none; }
+
+.fc_table .fw-semibold { font-weight: 600; }
+.fc_table .text-end { text-align: right; }
+.fc_table .text-center { text-align: center; }
+
+.fc_table_totals td {
+  background: var(--bg-surface-2) !important;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-top: 2px solid var(--border-strong) !important;
+  border-bottom: none !important;
+}
+
+.fc_empty_state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.fc_empty_state i {
+  display: block;
+  font-size: 40px;
+  opacity: 0.3;
+  margin-bottom: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BADGES
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.fc_badge--success { background: rgba(5, 150, 105, 0.12); color: var(--fc-success); }
+.fc_badge--danger  { background: rgba(220, 38, 38, 0.12); color: var(--fc-danger); }
+.fc_badge--warning { background: rgba(217, 119, 6, 0.12); color: var(--fc-warning); }
+.fc_badge--neutral { background: var(--bg-hover); color: var(--text-secondary); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROGRESS BARS
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_progress_wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.fc_progress_track {
+  flex: 1;
+  max-width: 80px;
+  height: 6px;
+  background: var(--bg-hover);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fc_progress_bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fc_progress_bar--success { background: linear-gradient(90deg, var(--fc-success), #34D399); }
+.fc_progress_bar--warning { background: linear-gradient(90deg, var(--fc-warning), #FBBF24); }
+.fc_progress_bar--danger  { background: linear-gradient(90deg, var(--fc-danger), #F87171); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TANK CARDS
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_tank_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+}
+
+.fc_tank {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-xs);
+}
+
+.fc_tank:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.fc_tank--ok       { border-top: 4px solid var(--fc-success); }
+.fc_tank--low      { border-top: 4px solid var(--fc-warning); }
+.fc_tank--critical { border-top: 4px solid var(--fc-danger); }
+
+.fc_tank_donut {
+  position: relative;
+  width: 120px; height: 120px;
+  margin-bottom: 8px;
+}
+
+.fc_tank_pct {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.fc_tank_name { font-weight: 700; font-size: 0.9rem; }
+.fc_tank_product { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; }
+.fc_tank_levels { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOADING
+   ═══════════════════════════════════════════════════════════════════ */
+.fc_loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-muted);
+}
+
+.fc_spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--fc-navy);
+  border-radius: 50%;
+  animation: fc_spin 0.9s linear infinite;
+}
+
+body.fc-dark-mode .fc_spinner { border-top-color: var(--fc-teal); }
+
+@keyframes fc_spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FUEL DETAIL TABLE — three rows per shift (Diesel / Petrol / Shift Total)
+   First FIVE columns are sticky (Date, Shift, Branch, Supervisor, Fuel).
+   Header row is sticky within a bounded-height scroll region.
+   Column widths widened so long headers render fully.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Bounded-height scroll region — makes sticky header + sticky columns
+   actually stick. Without a bounded ancestor, `position: sticky; top: 0`
+   has nothing to stick against. */
+.fc_fuel_detail_scroll {
+  max-height: calc(100vh - 340px);
+  min-height: 280px;
+  overflow: auto;
+  padding: 0 0 8px 0;
+}
+
+.fc_fuel_detail_table {
+  width: 100%;
+  min-width: 2900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.78rem;
+  table-layout: fixed;
+}
+
+.fc_fuel_detail_table th,
+.fc_fuel_detail_table td {
+  white-space: nowrap;
+  padding: 8px 10px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--divider);
+}
+
+.fc_fuel_detail_table td.text-end {
+  font-variant-numeric: tabular-nums;
+  padding-right: 14px;
+}
+
+/* Ensure the header cells render their full label even under fixed layout */
+.fc_fuel_detail_table thead th {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  word-break: keep-all;
+  hyphens: none;
+}
+
+/* Extra safety for the wide numeric/kwacha/shift headers */
+.fc_fuel_detail_table thead th.fc_fd_col_num,
+.fc_fuel_detail_table thead th.fc_fd_col_kwacha,
+.fc_fuel_detail_table thead th.fc_fd_col_shift_lvl,
+.fc_fuel_detail_table thead th.fc_fd_col_wide {
+  white-space: nowrap;
+  overflow: visible;
+  padding: 8px 12px;
+}
+
+/* Column widths — sized so no header text is clipped.
+   NOTE: `.fc_fd_col_shift` is now used ONLY for the Shift column (68px).
+   The shift-level Kwacha columns (POS / Lubes / LPG / Expected Cash @ Hand
+   / Cash @ Hand / Cash Variance) use `.fc_fd_col_shift_lvl` at 155px.
+   The single wide column "Expected Cash @ Hand (K)" uses `.fc_fd_col_wide`. */
+.fc_fd_col_date        { width: 90px;  }
+.fc_fd_col_shift       { width: 68px;  }
+.fc_fd_col_branch      { width: 95px;  }
+.fc_fd_col_supervisor  { width: 110px; }
+.fc_fd_col_fuel        { width: 78px;  }
+.fc_fd_col_num         { width: 150px; }
+.fc_fd_col_kwacha      { width: 145px; }
+.fc_fd_col_shift_lvl   { width: 155px; }
+.fc_fd_col_wide        { width: 190px; }
+
+/* ─── Sticky identity columns — Date, Shift, Branch, Supervisor, Fuel ─── */
+
+.fc_fuel_detail_table thead th.fc_fd_sticky_h,
+.fc_fuel_detail_table tbody td.fc_fd_sticky_c {
+  position: sticky;
+  background: var(--bg-surface);
+  z-index: 1;
+}
+
+.fc_fuel_detail_table thead th.fc_fd_sticky_h {
+  z-index: 4;
+  background: var(--bg-surface-2);
+}
+
+/* Sticky offsets = cumulative widths of the preceding sticky columns.
+     Date       : 0
+     Shift      : 90
+     Branch     : 158   (90 + 68)
+     Supervisor : 253   (158 + 95)
+     Fuel       : 363   (253 + 110)  */
+.fc_fd_sticky_1 { left: 0px;   }
+.fc_fd_sticky_2 { left: 90px;  }
+.fc_fd_sticky_3 { left: 158px; }
+.fc_fd_sticky_4 { left: 253px; }
+.fc_fd_sticky_5 { left: 363px; }
+
+/* Soft divider on the interior sticky boundaries; strong divider on the
+   final sticky column so the pinned group is visually separated. */
+.fc_fd_sticky_1,
+.fc_fd_sticky_2,
+.fc_fd_sticky_3,
+.fc_fd_sticky_4 {
+  box-shadow: inset -1px 0 0 var(--border-subtle);
+}
+.fc_fd_sticky_5 {
+  box-shadow: inset -2px 0 0 var(--border-strong);
+}
+
+.fc_fuel_detail_table tbody tr:hover td.fc_fd_sticky_c {
+  background: var(--bg-hover);
+}
+
+.fc_fd_sticky_wide {
+  left: 0;
+  width: 441px;
+  min-width: 441px;
+  max-width: 441px;
+  z-index: 2;
+}
+
+.fc_fd_total_label {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+/* ─── Fuel badge cell ────────────────────────────────────────────── */
+
+.fc_fd_fuel_badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  white-space: nowrap;
+  border-left: 2px solid var(--border-strong);
+}
+
+.fc_fd_badge_diesel {
+  color: #B45309;
+  background: rgba(217, 119, 6, 0.08);
+}
+
+.fc_fd_badge_petrol {
+  color: #0E7C86;
+  background: rgba(14, 124, 134, 0.08);
+}
+
+/* ─── Shift-level Kwacha column cells ────────────────────────────── */
+
+.fc_fd_shift_cell {
+  background: var(--bg-surface-2);
+  border-left: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.fc_fd_shift_total {
+  background: var(--bg-hover) !important;
+  font-weight: 700;
+}
+
+/* ─── Shift-total row (third row per shift) ──────────────────────── */
+
+.fc_fd_shift_row td {
+  background: var(--bg-surface-2) !important;
+  border-bottom: 2px solid var(--border-strong);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.fc_fd_shift_label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--fc-navy) !important;
+  background: rgba(15, 41, 66, 0.08) !important;
+  border-left: 2px solid var(--border-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.fc-dark-mode .fc_fd_shift_label {
+  color: var(--fc-teal) !important;
+  background: rgba(45, 212, 191, 0.08) !important;
+}
+
+.fc_fd_shift_total {
+  color: var(--text-primary);
+}
+
+.fc_fd_shift_level {
+  background: rgba(201, 169, 97, 0.12) !important;
+  border-left: 1px solid var(--border-subtle);
+  font-weight: 700;
+}
+
+body.fc-dark-mode .fc_fd_shift_level {
+  background: rgba(251, 191, 36, 0.08) !important;
+}
+
+/* ─── Row separators ─────────────────────────────────────────────── */
+
+.fc_fd_diesel_row td {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.fc_fd_petrol_row td {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.fc_fuel_detail_table tbody tr:first-child td {
+  border-top: none;
+}
+
+/* ─── Totals rows ────────────────────────────────────────────────── */
+
+.fc_fuel_detail_table tr.fc_table_totals td {
+  background: var(--bg-surface-2) !important;
+  font-weight: 700;
+}
+
+.fc_fuel_detail_table tr.fc_table_totals td.fc_fd_sticky_c {
+  background: var(--bg-surface-2) !important;
+}
+
+.fc_fuel_detail_table tr.fc_table_totals.fc_fd_diesel_row td {
+  border-top: 2px solid var(--border-strong);
+}
+
+.fc_fuel_detail_table .fc_empty_state {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+/* ─── Dark mode ──────────────────────────────────────────────────── */
+
+body.fc-dark-mode .fc_fuel_detail_table thead th.fc_fd_sticky_h {
+  background: var(--bg-surface-2);
+}
+
+body.fc-dark-mode .fc_fuel_detail_table tbody td.fc_fd_sticky_c {
+  background: var(--bg-surface);
+}
+
+body.fc-dark-mode .fc_fuel_detail_table tbody tr:hover td.fc_fd_sticky_c {
+  background: var(--bg-hover);
+}
+
+body.fc-dark-mode .fc_fd_badge_diesel {
+  color: #FBBF24;
+  background: rgba(251, 191, 36, 0.08);
+}
+
+body.fc-dark-mode .fc_fd_badge_petrol {
+  color: #2DD4BF;
+  background: rgba(45, 212, 191, 0.08);
+}
+
+body.fc-dark-mode .fc_fd_shift_cell {
+  background: var(--bg-surface-2);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   SPLIT-TABLE STYLES — used by Variances and Losses & Gains
+   Two rows per branch: DIESEL on top, PETROL below.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fc_var_split_table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+}
+
+.fc_var_split_table th,
+.fc_var_split_table td {
+  padding: 10px 12px;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--divider);
+}
+
+.fc_var_split_branch {
+  background: var(--bg-surface-2);
+  border-right: 2px solid var(--border-strong) !important;
+  text-align: left;
+  vertical-align: middle;
+  padding-left: 16px !important;
+}
+
+.fc_var_branch_total_row td {
+  background: var(--bg-surface-2) !important;
+  font-weight: 700;
+  border-top: 1px solid var(--border-strong) !important;
+  border-bottom: 2px solid var(--border-strong) !important;
+}
+
+/* Row separators to visually group the two-fuel block */
+.fc_var_split_table .fc_fd_diesel_row td {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.fc_var_split_table .fc_fd_petrol_row td {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Dark mode tweaks */
+body.fc-dark-mode .fc_var_split_branch {
+  background: var(--bg-surface-2);
+}
+
+body.fc-dark-mode .fc_var_branch_total_row td {
+  background: var(--bg-surface-2) !important;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   VARIANCE DIRECTIONAL COLOURS
+   Gain = green, Loss = red — used by the varColor() helper
+   ═══════════════════════════════════════════════════════════════════ */
+
+.fc_var_gain {
+  color: var(--fc-success) !important;
+  font-weight: 700;
+}
+
+.fc_var_loss {
+  color: var(--fc-danger) !important;
+  font-weight: 700;
+}
+
+body.fc-dark-mode .fc_var_gain { color: #34D399 !important; }
+body.fc-dark-mode .fc_var_loss { color: #F87171 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DARK MODE SCROLLBAR
+   ═══════════════════════════════════════════════════════════════════ */
+body.fc-dark-mode ::-webkit-scrollbar { width: 10px; height: 10px; }
+body.fc-dark-mode ::-webkit-scrollbar-track { background: #0A0E1A; }
+body.fc-dark-mode ::-webkit-scrollbar-thumb { background: #374151; border-radius: 5px; }
+body.fc-dark-mode ::-webkit-scrollbar-thumb:hover { background: #4B5563; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .fc_hero { padding: 16px 18px; min-height: 76px; }
+  .fc_brand_logo { width: 42px !important; height: 42px !important; min-width: 42px !important; font-size: 19px; }
+  .fc_brand_title { font-size: 1rem; }
+  .fc_brand_sub { font-size: 0.65rem; }
+  .fc_filters { padding: 12px 18px; }
+  .fc_kpi_grid { padding: 18px; gap: 12px; }
+  .fc_tabs_wrap { padding: 0 18px 18px; }
+  .fc_kpi_value { font-size: 1.35rem; }
+  .fc_chart_area { height: 280px; padding: 16px; }
+  .fc_icon_btn { width: 36px !important; height: 36px !important; min-width: 36px !important; }
+}
+
+@media (max-width: 600px) {
+  .fc_kpi_grid { grid-template-columns: 1fr; }
+  .fc_hero_actions { width: 100%; justify-content: flex-end; margin-left: 0; }
+  .fc_brand { width: 100%; justify-content: flex-start; }
+  .fc_filter_group { flex: 1 1 45%; }
+  .fc_filter_input { width: 100%; min-width: 0; }
+  .fc_live_badge { padding: 5px 10px; font-size: 0.65rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TAB NAV — NARROW VIEWPORT FALLBACK
+   On narrower screens, wrap the tabs instead of hiding the right-side
+   ones (Valuation, Trends). Prevents them becoming unreachable when
+   the pill bar can't scroll visually.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 1400px) {
+  .fc_tabs_nav {
+    flex-wrap: wrap;
+    border-radius: var(--radius-lg);
+    overflow-x: visible;
+    overflow-y: visible;
+    scrollbar-width: none;
+  }
+  .fc_tabs_nav::-webkit-scrollbar { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DARK MODE — NATIVE FORM CONTROLS
+   Browsers render <option> popups using OS native styling, ignoring
+   our CSS variables. These rules force the correct colours in both
+   modes so the dropdown list is readable.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Force the browser to use dark-aware native styling for form controls */
+.fc_filter_input,
+.fc_filter_input option {
+  color-scheme: light;
+}
+
+body.fc-dark-mode .fc_filter_input,
+body.fc-dark-mode .fc_filter_input option {
+  color-scheme: dark;
+}
+
+/* Explicit colours on <option> — required for Chrome/Edge on Windows */
+.fc_filter_input option {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+body.fc-dark-mode .fc_filter_input option {
+  background-color: #1F2937;
+  color: #F1F5F9;
+}
+
+/* Ensure the closed <select> itself is also dark-consistent in dark mode */
+body.fc-dark-mode .fc_filter_input {
+  background-color: var(--bg-surface-2);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+/* Focused / hover state on the options (Firefox honours this; Chrome
+   uses the OS highlight colour, which is fine). */
+.fc_filter_input option:hover,
+.fc_filter_input option:focus,
+.fc_filter_input option:checked {
+  background-color: var(--fc-navy);
+  color: #FFFFFF;
+}
+
+body.fc-dark-mode .fc_filter_input option:hover,
+body.fc-dark-mode .fc_filter_input option:focus,
+body.fc-dark-mode .fc_filter_input option:checked {
+  background-color: #38BDF8;
+  color: #0A0E1A;
+}

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequences -->
+    <record id="seq_forecourt_shift" model="ir.sequence">
+        <field name="name">Forecourt Shift</field>
+        <field name="code">forecourt.shift</field>
+        <field name="prefix">SHF/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_forecourt_sale" model="ir.sequence">
+        <field name="name">Forecourt Sale</field>
+        <field name="code">forecourt.sale</field>
+        <field name="prefix">FCS/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_forecourt_delivery" model="ir.sequence">
+        <field name="name">Forecourt Delivery</field>
+        <field name="code">forecourt.delivery</field>
+        <field name="prefix">DEL/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_forecourt_dip" model="ir.sequence">
+        <field name="name">Forecourt Dip Reading</field>
+        <field name="code">forecourt.dip.reading</field>
+        <field name="prefix">DIP/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_forecourt_meter" model="ir.sequence">
+        <field name="name">Forecourt Meter Reading</field>
+        <field name="code">forecourt.meter.reading</field>
+        <field name="prefix">MTR/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_forecourt_cash_recon" model="ir.sequence">
+        <field name="name">Forecourt Cash Reconciliation</field>
+        <field name="code">forecourt.cash.reconciliation</field>
+        <field name="prefix">RCN/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>
+
+

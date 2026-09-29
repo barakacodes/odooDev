@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Forecourt Shift Capture</title></head>
+<body>
+<h1>Forecourt Shift Capture &amp; Reconciliation</h1>
+<p>Extends <code>forecourt_operations</code> to capture the 14 daily shift data
+points hand-recorded by shift managers and runs four reconciliation checks
+in the background.</p>
+<ul>
+  <li>Opening stock vs previous shift&rsquo;s system closing stock.</li>
+  <li>Opening + received &minus; sold vs closing stock.</li>
+  <li>ATG closing vs DIP closing (per fuel grade).</li>
+  <li>&Sigma;(cash-sales litres &times; fuel rate) vs (cash on hand &minus; POS account).</li>
+</ul>
+<p>Adds a <em>Shift Capture</em> tab on the shift form, a <code>forecourt.shift.fuel.entry</code>
+child model, global per-shift cash / POS / lube / LPG fields, and a date-effective
+<code>forecourt.fuel.rate</code> table (seed: Petrol K27.15, Diesel K33.99).</p>
+</body></html>

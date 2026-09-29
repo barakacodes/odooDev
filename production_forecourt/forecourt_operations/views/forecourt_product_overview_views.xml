@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_product_overview_list" model="ir.ui.view">
+        <field name="name">forecourt.product.overview.tree</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <list string="Forecourt Product Overview" create="false" delete="false" edit="false">
+                <field name="default_code" string="Code"/>
+                <field name="name"/>
+                <field name="forecourt_product_type" string="Type"/>
+                <field name="fuel_grade" optional="show"/>
+                <field name="lpg_cylinder_size" optional="show"/>
+                <field name="unit_of_sale"/>
+                <field name="standard_price" string="Cost Price"/>
+                <field name="list_price" string="Sales Price"/>
+                <field name="forecourt_selling_price" string="Forecourt Pump Price"/>
+                <field name="taxes_id" widget="many2many_tags" string="Taxes"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_product_overview_search" model="ir.ui.view">
+        <field name="name">forecourt.product.overview.search</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="default_code"/>
+                <filter name="fuel" string="Fuel" domain="[('forecourt_product_type','=','fuel')]"/>
+                <filter name="lpg" string="LPG" domain="[('forecourt_product_type','=','lpg')]"/>
+                <filter name="lubricant" string="Lubricant" domain="[('forecourt_product_type','=','lubricant')]"/>
+                <separator/>
+                <filter name="no_cost" string="Missing Cost Price" domain="[('standard_price','=',0)]"/>
+                <filter name="no_tax" string="No Tax Configured" domain="[('taxes_id','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_type" string="Product Type" context="{'group_by': 'forecourt_product_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_forecourt_product_overview" model="ir.actions.act_window">
+        <field name="name">Product Overview (Inventory Data)</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('forecourt_product_type', 'in', ['fuel', 'lpg', 'lubricant'])]</field>
+        <field name="view_id" ref="view_forecourt_product_overview_list"/>
+        <field name="search_view_id" ref="view_forecourt_product_overview_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No forecourt products configured yet
+            </p>
+            <p>
+                This view pulls live Cost Price, Sales Price, Forecourt Pump Price and Taxes
+                directly from Inventory for every Petrol, Diesel, LPG and Lubricant product.
+                Use the "Missing Cost Price" and "No Tax Configured" filters to find gaps.
+            </p>
+        </field>
+    </record>
+</odoo>

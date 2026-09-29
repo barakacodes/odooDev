@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ── QWeb PDF report action ───────────────────────────────── -->
+        <record id="action_pos_fuel_report_pdf" model="ir.actions.report">
+            <field name="name">Daily Fuel Sales Report</field>
+            <field name="model">pos.fuel.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">forecourt_operations.pos_fuel_report_document</field>
+            <field name="report_file">forecourt_operations.pos_fuel_report_document</field>
+            <field name="print_report_name">'Daily_Fuel_Report_%s' % (object.report_date)</field>
+        </record>
+
+        <!-- ── Stock-report-style form view (full-page) ─────────────── -->
+        <record id="view_pos_fuel_report_wizard_form" model="ir.ui.view">
+            <field name="name">pos.fuel.report.wizard.form</field>
+            <field name="model">pos.fuel.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Daily Fuel Sales Report">
+                    <div class="d-flex flex-row" style="min-height:580px;">
+                        <div class="bg-light border-end p-3"
+                             style="min-width:220px; max-width:250px; flex-shrink:0;">
+                            <div class="mb-3">
+                                <span class="fw-bold fs-5 text-primary">
+                                    <i class="fa fa-filter me-1"/> Filters
+                                </span>
+                                <hr class="mt-1 mb-2"/>
+                            </div>
+                            <group col="1">
+                                <field name="report_date" widget="date"/>
+                                <field name="branch"/>
+                                <field name="shift_type"/>
+                                <field name="section_id"/>
+                                <field name="company_id"
+                                       groups="base.group_multi_company"/>
+                            </group>
+                            <div class="d-grid gap-2 mt-4">
+                                <button name="action_generate_report"
+                                        type="object"
+                                        string="Generate Report"
+                                        class="btn btn-primary"/>
+                                <button name="action_print_pdf"
+                                        type="object"
+                                        string="Print PDF"
+                                        class="btn btn-outline-secondary btn-sm"/>
+                                <button name="action_export_excel"
+                                        type="object"
+                                        string="Export Excel"
+                                        class="btn btn-outline-secondary btn-sm"/>
+                            </div>
+                            <div class="mt-4 text-muted small">
+                                <i class="fa fa-info-circle me-1"/>
+                                Set filters then click<br/>
+                                <strong>Generate Report</strong> to load data.
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 overflow-auto p-2">
+                            <field name="line_ids" nolabel="1" colspan="1">
+                                <list string="Shift Results"
+                                      create="0" delete="0" edit="0"
+                                      decoration-muted="grand_amount == 0">
+                                    <field name="session_date" string="Date"/>
+                                    <field name="branch" string="Branch"/>
+                                    <field name="shift_label" string="Shift"/>
+                                    <field name="session_name" string="Session"/>
+                                    <field name="petrol_opening" string="P. Opening (L)" optional="show"/>
+                                    <field name="petrol_received" string="P. Received (L)" optional="show"/>
+                                    <field name="petrol_sold_litres" string="P. Sold (L)"/>
+                                    <field name="petrol_cash_litres" string="P. Cash (L)" optional="hide"/>
+                                    <field name="petrol_card_litres" string="P. Card (L)" optional="hide"/>
+                                    <field name="petrol_cash_amount" string="P. Cash (ZMW)" optional="show"/>
+                                    <field name="petrol_card_amount" string="P. Card (ZMW)" optional="show"/>
+                                    <field name="petrol_total_amount" string="P. Total (ZMW)"/>
+                                    <field name="petrol_prepaid_litres" string="P. Prepaid (L)" optional="hide"/>
+                                    <field name="petrol_prepaid_amount" string="P. Prepaid (ZMW)" optional="hide"/>
+                                    <field name="petrol_account_litres" string="P. Account (L)" optional="hide"/>
+                                    <field name="petrol_account_amount" string="P. Account (ZMW)" optional="hide"/>
+                                    <field name="petrol_test_litres" string="P. Test (L)" optional="hide"/>
+                                    <field name="petrol_test_amount" string="P. Test (ZMW)" optional="hide"/>
+                                    <field name="petrol_closing" string="P. Closing (L)" optional="show"/>
+                                    <field name="diesel_opening" string="D. Opening (L)" optional="show"/>
+                                    <field name="diesel_received" string="D. Received (L)" optional="show"/>
+                                    <field name="diesel_sold_litres" string="D. Sold (L)"/>
+                                    <field name="diesel_cash_litres" string="D. Cash (L)" optional="hide"/>
+                                    <field name="diesel_card_litres" string="D. Card (L)" optional="hide"/>
+                                    <field name="diesel_cash_amount" string="D. Cash (ZMW)" optional="show"/>
+                                    <field name="diesel_card_amount" string="D. Card (ZMW)" optional="show"/>
+                                    <field name="diesel_total_amount" string="D. Total (ZMW)"/>
+                                    <field name="diesel_prepaid_litres" string="D. Prepaid (L)" optional="hide"/>
+                                    <field name="diesel_prepaid_amount" string="D. Prepaid (ZMW)" optional="hide"/>
+                                    <field name="diesel_account_litres" string="D. Account (L)" optional="hide"/>
+                                    <field name="diesel_account_amount" string="D. Account (ZMW)" optional="hide"/>
+                                    <field name="diesel_test_litres" string="D. Test (L)" optional="hide"/>
+                                    <field name="diesel_test_amount" string="D. Test (ZMW)" optional="hide"/>
+                                    <field name="diesel_closing" string="D. Closing (L)" optional="show"/>
+                                    <field name="grand_litres" string="Total Litres"/>
+                                    <field name="grand_cash" string="Cash (ZMW)" optional="show"/>
+                                    <field name="grand_card" string="Card (ZMW)" optional="show"/>
+                                    <field name="grand_amount" string="Grand Total (ZMW)"/>
+                                </list>
+                            </field>
+                        </div>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- ── Main action ───────────────────────────────────────────── -->
+        <record id="action_pos_fuel_report_wizard" model="ir.actions.act_window">
+            <field name="name">Daily Fuel Sales Report</field>
+            <field name="res_model">pos.fuel.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+        </record>
+
+    </data>
+</odoo>

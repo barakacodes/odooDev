@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit Partner Form View -->
+    <record id="view_partner_form_inherit_zra" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.zra</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add TPIN field after VAT -->
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="zra_tpin" placeholder="1002679576"/>
+            </xpath>
+
+            <!-- Branch Customer sync (checklist #4, #5) -->
+            <div name="button_box" position="inside">
+                <button name="action_save_to_zra" type="object"
+                        class="oe_stat_button" icon="fa-cloud-upload"
+                        invisible="not zra_tpin or zra_customer_synced">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Save to ZRA</span>
+                    </div>
+                </button>
+                <button name="action_fetch_from_zra" type="object"
+                        class="oe_stat_button" icon="fa-cloud-download"
+                        invisible="not zra_tpin">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Fetch from ZRA</span>
+                    </div>
+                </button>
+                <button name="action_verify_tpin_on_zra" type="object"
+                        class="oe_stat_button" icon="fa-shield"
+                        invisible="not zra_tpin">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Verify TPIN on ZRA</span>
+                    </div>
+                </button>
+                <field name="zra_si_registration" invisible="1"/>
+                <div class="oe_stat_button" invisible="zra_si_registration != 'registered'">
+                    <div class="o_field_widget o_stat_info">
+                        <i class="fa fa-check-circle text-success"/>
+                        <span class="o_stat_text">SI Registered</span>
+                    </div>
+                </div>
+                <div class="oe_stat_button" invisible="zra_si_registration != 'not_registered'">
+                    <div class="o_field_widget o_stat_info">
+                        <i class="fa fa-exclamation-triangle text-danger"/>
+                        <span class="o_stat_text text-danger">Not SI Registered</span>
+                    </div>
+                </div>
+                <div class="oe_stat_button" invisible="not zra_customer_synced">
+                    <div class="o_field_widget o_stat_info">
+                        <i class="fa fa-check-circle text-success"/>
+                        <span class="o_stat_text">Saved on ZRA</span>
+                    </div>
+                </div>
+            </div>
+
+        </field>
+    </record>
+
+    <!-- Inherit Partner Tree View -->
+    <record id="view_partner_tree_inherit_zra" model="ir.ui.view">
+        <field name="name">res.partner.tree.inherit.zra</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="after">
+                <field name="zra_tpin" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

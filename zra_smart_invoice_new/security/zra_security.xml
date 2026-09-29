@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Multi-company record rules (security hardening):
+         zra.config holds the TPIN / device serial / VSDC URL, and zra.api.log
+         holds full request/response payloads — without these rules any
+         accounting user could read every company's ZRA credentials and logs.
+         Reference-data models (zra.classification.code, zra.standard.code)
+         are ZRA-wide constants and intentionally stay shared. -->
+
+    <record id="rule_zra_config_company" model="ir.rule">
+        <field name="name">ZRA Config: multi-company</field>
+        <field name="model_id" ref="model_zra_config"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_zra_api_log_company" model="ir.rule">
+        <field name="name">ZRA API Log: multi-company</field>
+        <field name="model_id" ref="model_zra_api_log"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_zra_import_declaration_company" model="ir.rule">
+        <field name="name">ZRA Import Declaration: multi-company</field>
+        <field name="model_id" ref="model_zra_import_declaration"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_zra_import_declaration_line_company" model="ir.rule">
+        <field name="name">ZRA Import Declaration Line: multi-company</field>
+        <field name="model_id" ref="model_zra_import_declaration_line"/>
+        <field name="domain_force">[('declaration_id.company_id', 'in', company_ids)]</field>
+    </record>
+
+</odoo>

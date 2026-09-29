@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- checklist #24 / internal checklist "no unmarked duplicate": the
+         module's own COPY/DUPLICATE watermark and print-count tracking
+         (models/ir_actions_report.py, report/invoice_report_zra.xml) only
+         fire for report_name 'zra_smart_invoice_new.report_zra_invoice_details'.
+         Odoo's core "Invoice PDF" / "PDF without Payment" report actions are
+         also bound to account.move's Print menu by default and render a
+         completely different template with no watermark, no print-count,
+         and none of the ZRA SDC/QR fiscal details — so anyone could pick
+         that instead and get an unlimited, unmarked "duplicate" of a
+         fiscalized invoice. Deliberately no `noupdate="1"` on this file: it
+         must re-assert on every module upgrade in case a core Odoo update
+         (or another module) re-adds the binding. -->
+    <record id="account.account_invoices_without_payment" model="ir.actions.report">
+        <field name="binding_model_id" eval="False"/>
+    </record>
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="binding_model_id" eval="False"/>
+    </record>
+</odoo>

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Complete ZRA Fiscal Tax Invoice Report - Does NOT modify default Odoo invoice -->
+    <template id="report_zra_fiscal_invoice_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+
+            <div class="page">
+
+                <!-- checklist #24: COPY / DUPLICATE watermark on reprints -->
+                <div t-if="o.zra_print_count > 1"
+                     style="position: fixed; top: 40%; left: 15%; transform: rotate(-30deg);
+                            font-size: 72px; color: rgba(200,0,0,0.25); font-weight: bold;
+                            z-index: 1000; pointer-events: none;">
+                    COPY
+                </div>
+
+                <!-- checklist #19(i): 'tax invoice' prominently displayed -->
+                <div class="row" style="text-align: center; margin-bottom: 5px;">
+                    <div class="col-12">
+                        <h2 style="color: #875A7B; letter-spacing: 2px;">
+                            <span t-if="o.move_type == 'out_invoice' and not o.zra_debit_reason">TAX INVOICE</span>
+                            <span t-if="o.move_type == 'out_refund'">CREDIT NOTE</span>
+                            <span t-if="o.move_type == 'out_invoice' and o.zra_debit_reason">DEBIT NOTE</span>
+                        </h2>
+                        <span t-if="o.zra_print_count > 1" class="badge text-bg-danger">DUPLICATE / COPY</span>
+                    </div>
+                </div>
+
+                <!-- checklist #19(ii): registered supplier's TPIN, name, address -->
+                <div class="row mt-2 mb-2">
+                    <div class="col-6">
+                        <strong t-field="o.company_id.name"/><br/>
+                        <span t-field="o.company_id.partner_id.contact_address" style="white-space: pre-line;"/><br/>
+                        <strong>TPIN: </strong><span t-field="o.zra_supplier_tpin"/>
+                    </div>
+                    <!-- checklist #19(v): customer's TPIN, name, address, where applicable -->
+                    <div class="col-6 text-end">
+                        <strong t-field="o.partner_id.name"/><br/>
+                        <span t-field="o.partner_id.contact_address" style="white-space: pre-line;"/><br/>
+                        <strong>Customer TPIN: </strong>
+                        <span t-field="o.partner_id.zra_tpin" t-if="o.partner_id.zra_tpin"/>
+                        <span t-if="not o.partner_id.zra_tpin">N/A</span>
+                    </div>
+                </div>
+
+                <!-- checklist #19(iii), (iv): invoice date and invoice number -->
+                <div class="row mt-3 mb-3">
+                    <div class="col-4">
+                        <strong>Invoice Number</strong><br/>
+                        <span t-field="o.name"/>
+                    </div>
+                    <div class="col-4">
+                        <strong>Invoice Date</strong><br/>
+                        <span t-field="o.invoice_date"/>
+                    </div>
+                    <div class="col-4">
+                        <strong>Due Date</strong><br/>
+                        <span t-field="o.invoice_date_due"/>
+                    </div>
+                </div>
+
+                <!-- checklist #19(vi), (vii): line description, qty, price, tax-excl amount, tax rate -->
+                <table class="table table-sm o_main_table table-borderless mt-4">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <th class="text-start">Description</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-center">Unit Price</th>
+                            <th class="text-center">Tax Rate</th>
+                            <th class="text-end">Amount (Excl. Tax)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.invoice_line_ids" t-as="line">
+                            <t t-if="line.display_type == 'product'">
+                                <tr>
+                                    <td class="text-start">
+                                        <span t-field="line.product_id.default_code" t-if="line.product_id.default_code"/><br t-if="line.product_id.default_code"/>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.quantity"/>
+                                        <span t-field="line.product_uom_id.name"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span t-field="line.price_unit"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <t t-if="line.tax_ids">
+                                            <!-- Odoo's own XML data loader (odoo/tools/convert.py) collapses
+                                                 every '%%' to '%' while loading this <template>'s body — a
+                                                 documented "backward compatibility" behavior, unconditional,
+                                                 unrelated to QWeb. Confirmed live: the single-%% form below
+                                                 that this comment replaces loaded as '%s%' % t.amount, which
+                                                 Python raises ValueError: incomplete format on for ANY invoice
+                                                 with a tax line — not a cosmetic glitch, a hard crash that
+                                                 breaks printing entirely. Four %% here survive the loader's
+                                                 one-time collapse to become the two %% this t-esc's own,
+                                                 second, independent %-format evaluation at render time needs
+                                                 to print a literal '%' sign. -->
+                                            <span t-esc="', '.join('%s%%%%' % t.amount for t in line.tax_ids)"/>
+                                        </t>
+                                        <t t-else="">0%</t>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="line.price_subtotal"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="line.display_type == 'line_section'">
+                                <tr>
+                                    <td colspan="5" style="font-weight: bold;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="line.display_type == 'line_note'">
+                                <tr>
+                                    <td colspan="5" style="font-style: italic;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table>
+
+                <!-- Payment Communication -->
+                <div class="row mt-3" t-if="o.payment_reference">
+                    <div class="col-12">
+                        <strong>Payment Communication: </strong>
+                        <span t-field="o.payment_reference"/>
+                    </div>
+                </div>
+
+                <!-- checklist #19(viii): total excl tax, discount rate/amount, total tax, total incl tax -->
+                <div class="row mt-4">
+                    <div class="col-6">
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="text-start">Untaxed Amount</td>
+                                <td class="text-end">
+                                    <span t-field="o.amount_untaxed"/>
+                                </td>
+                            </tr>
+                            <tr t-if="o.zra_total_discount">
+                                <td class="text-start">Discount<t t-if="o.zra_discount_rate"> (<t t-esc="round(o.zra_discount_rate, 1)"/>%)</t></td>
+                                <td class="text-end">
+                                    <span t-field="o.zra_total_discount"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-start">Total Tax</td>
+                                <td class="text-end">
+                                    <span t-field="o.amount_tax"/>
+                                </td>
+                            </tr>
+                            <tr style="border-top: 1px solid #dee2e6;">
+                                <td class="text-start" style="color: #875A7B;"><strong>Total</strong></td>
+                                <td class="text-end" style="color: #875A7B;">
+                                    <strong>
+                                        <span t-field="o.amount_total"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- checklist #19(ix): SDC information — QR code, SDC ID, invoice type, VSDC date, internal data, signature -->
+                <t t-if="o.zra_sync_status == 'synced' and o.zra_receipt_number">
+                    <div style="border: 2px solid #000; padding: 15px; margin-top: 30px;">
+                        <h4 style="text-align: center; margin-bottom: 15px; font-weight: bold;">
+                            ZRA SMART INVOICE DETAILS
+                        </h4>
+
+                        <!-- QR Code -->
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <t t-if="o.zra_qr_code_image">
+                                <img t-att-src="'data:image/png;base64,' + (o.zra_qr_code_image.decode('utf-8') if o.zra_qr_code_image else '')"
+                                     style="width: 130px; height: 130px;"
+                                     alt="ZRA QR Code"/>
+                            </t>
+                        </div>
+
+                        <!-- ZRA Details Table -->
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 5px; font-weight: bold; width: 35%;">INVOICE TYPE:</td>
+                                <td style="padding: 5px;" t-esc="o.zra_invoice_type_label or ''"/>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd; background-color: #f9f9f9;">
+                                <td style="padding: 5px; font-weight: bold;">INV NO:</td>
+                                <td style="padding: 5px;" t-esc="o.zra_invoice_number or ''"/>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 5px; font-weight: bold;">VSDC DATE:</td>
+                                <td style="padding: 5px;" t-esc="o.zra_vsdc_receipt_date or ''"/>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd; background-color: #f9f9f9;">
+                                <td style="padding: 5px; font-weight: bold;">INTRL DATA:</td>
+                                <td style="padding: 5px; font-family: monospace; font-size: 10px;" t-esc="o.zra_internal_data or ''"/>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 5px; font-weight: bold;">RCPT SIGN:</td>
+                                <td style="padding: 5px; font-family: monospace; font-size: 10px;" t-esc="o.zra_signature or ''"/>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd; background-color: #f9f9f9;">
+                                <td style="padding: 5px; font-weight: bold;">MRC NO:</td>
+                                <td style="padding: 5px;" t-esc="o.zra_mrc_no or ''"/>
+                            </tr>
+                            <tr style="background-color: #f9f9f9;">
+                                <td style="padding: 5px; font-weight: bold;">SDC ID:</td>
+                                <td style="padding: 5px;" t-esc="o.zra_sdc_id or ''"/>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px; font-size: 10px; color: #666; font-style: italic;">
+                        This invoice has been registered with the Zambia Revenue Authority
+                    </div>
+                </t>
+
+                <!-- Narration/Notes -->
+                <t t-if="o.narration">
+                    <div class="mt-4">
+                        <strong>Notes:</strong>
+                        <p t-field="o.narration"/>
+                    </div>
+                </t>
+
+            </div>
+        </t>
+    </template>
+
+    <!-- Main Report Template -->
+    <template id="report_zra_invoice_details">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang or o.company_id.partner_id.lang"/>
+                <t t-call="zra_smart_invoice_new.report_zra_fiscal_invoice_document"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Report Action for ZRA Fiscal Invoice -->
+    <record id="action_report_zra_invoice_details" model="ir.actions.report">
+        <field name="name">ZRA Fiscal Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zra_smart_invoice_new.report_zra_invoice_details</field>
+        <field name="report_file">zra_smart_invoice_new.report_zra_invoice_details</field>
+        <field name="print_report_name">'ZRA_Fiscal_Invoice_%s' % object.name</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

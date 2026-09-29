@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Stock Adjustment Wizard Form -->
+    <record id="view_zra_stock_adjustment_form" model="ir.ui.view">
+        <field name="name">zra.stock.adjustment.form</field>
+        <field name="model">zra.stock.adjustment</field>
+        <field name="arch" type="xml">
+            <form string="ZRA Stock Adjustment">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Use this wizard to report stock adjustments directly to ZRA.
+                        Select the product, movement type, quantity and occurrence date.
+                    </div>
+                    <group>
+                        <group string="Product">
+                            <field name="product_id" options="{'no_create': True}"/>
+                            <field name="qty"/>
+                            <field name="occurrence_date"/>
+                        </group>
+                        <group string="Movement Details">
+                            <field name="movement_type"/>
+                            <field name="remark" placeholder="Optional remark"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_submit_to_zra" type="object"
+                            string="Submit to ZRA" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open wizard -->
+    <record id="action_zra_stock_adjustment" model="ir.actions.act_window">
+        <field name="name">ZRA Stock Adjustment</field>
+        <field name="res_model">zra.stock.adjustment</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Add "Sync with ZRA" button to stock.picking form -->
+    <record id="view_stock_picking_form_inherit_zra" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.zra</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_sync_stock_with_zra" type="object"
+                        string="Sync Stock with ZRA"
+                        class="btn-secondary"
+                        invisible="state != 'done'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

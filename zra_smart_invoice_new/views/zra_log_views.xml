@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ZRA API Log Form View -->
+    <record id="view_zra_api_log_form" model="ir.ui.view">
+        <field name="name">zra.api.log.form</field>
+        <field name="model">zra.api.log</field>
+        <field name="arch" type="xml">
+            <form string="ZRA API Log">
+                <header>
+                    <field name="status" widget="badge"
+                           decoration-success="status == 'success'"
+                           decoration-danger="status == 'failed'"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="endpoint"/>
+                            <field name="call_date"/>
+                        </group>
+                        <group>
+                            <field name="result_code"/>
+                            <field name="result_message"/>
+                            <field name="invoice_id"/>
+                            <field name="pos_order_id"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Request Data">
+                            <field name="request_data" widget="ace" options="{'mode': 'json'}"/>
+                        </page>
+                        <page string="Response Data">
+                            <field name="response_data" widget="ace" options="{'mode': 'json'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ZRA API Log Tree View -->
+    <record id="view_zra_api_log_tree" model="ir.ui.view">
+        <field name="name">zra.api.log.tree</field>
+        <field name="model">zra.api.log</field>
+        <field name="arch" type="xml">
+            <list string="ZRA API Logs" decoration-danger="status == 'failed'"
+                  decoration-success="status == 'success'">
+                <field name="call_date"/>
+                <field name="company_id"/>
+                <field name="endpoint"/>
+                <field name="status" widget="badge"
+                       decoration-success="status == 'success'"
+                       decoration-danger="status == 'failed'"/>
+                <field name="result_code" decoration-danger="result_code and result_code != '000'"/>
+                <field name="result_message"/>
+                <field name="invoice_id"/>
+                <field name="pos_order_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ZRA API Log Search View -->
+    <record id="view_zra_api_log_search" model="ir.ui.view">
+        <field name="name">zra.api.log.search</field>
+        <field name="model">zra.api.log</field>
+        <field name="arch" type="xml">
+            <search string="ZRA API Logs">
+                <field name="endpoint"/>
+                <field name="company_id"/>
+                <filter string="Success" name="filter_success" domain="[('status', '=', 'success')]"/>
+                <filter string="Failed" name="filter_failed" domain="[('status', '=', 'failed')]"/>
+                <separator/>
+                <filter string="Today" name="filter_today"
+                        domain="[('call_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <filter string="Last 7 Days" name="filter_week"
+                        domain="[('call_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Endpoint" name="group_endpoint" context="{'group_by': 'endpoint'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'call_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ZRA API Log Action -->
+    <record id="action_zra_api_log" model="ir.actions.act_window">
+        <field name="name">ZRA API Logs</field>
+        <field name="res_model">zra.api.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_failed': 1}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_credit_import_wizard_form" model="ir.ui.view">
+        <field name="name">forecourt.credit.import.wizard.form</field>
+        <field name="model">forecourt.credit.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import NetPOS Prepaid Customer Report">
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                        Upload a NetPOS PDF report â€” either a <b>Detailed Debtor Transaction List</b>
+                        (daily or date-range) or a <b>Debtors Summary / Account Balances</b> report.
+                        The type is detected automatically from the PDF content.
+                    </div>
+                    <group invisible="state != 'draft'">
+                        <field name="report_file" filename="report_filename"/>
+                        <field name="report_filename" invisible="1"/>
+                    </group>
+                    <div class="alert alert-success" role="alert" invisible="state != 'done'">
+                        <i class="fa fa-check-circle me-1"/> Import complete.
+                    </div>
+                    <group string="Result" invisible="not result_summary">
+                        <field name="result_summary" widget="text" nolabel="1" readonly="1"
+                               style="width:100%; font-family:monospace; font-size:12px; white-space:pre-wrap;"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_import" string="Import" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_credit_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import NetPOS Report</field>
+        <field name="res_model">forecourt.credit.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Credit Customer list/form -->
+    <record id="view_forecourt_credit_customer_list" model="ir.ui.view">
+        <field name="name">forecourt.credit.customer.list</field>
+        <field name="model">forecourt.credit.customer</field>
+        <field name="arch" type="xml">
+            <list string="Credit Customers" decoration-danger="abs(balance_variance) &gt; 1">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="branch_id"/>
+                <field name="computed_balance"/>
+                <field name="netpos_reported_balance"/>
+                <field name="balance_variance"/>
+                <field name="netpos_balance_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_credit_customer_form" model="ir.ui.view">
+        <field name="name">forecourt.credit.customer.form</field>
+        <field name="model">forecourt.credit.customer</field>
+        <field name="arch" type="xml">
+            <form string="Credit Customer">
+                <header>
+                    <button name="action_set_opening_balance_from_netpos"
+                            string="Set Opening Balance from NetPOS" type="object"
+                            class="btn-secondary"
+                            confirm="This will set the opening balance so your computed balance matches NetPOS exactly right now. Use only when you're confident all available transaction history has been imported."/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="branch_id"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group>
+                            <field name="opening_balance"/>
+                            <field name="computed_balance"/>
+                            <field name="netpos_reported_balance"/>
+                            <field name="netpos_balance_date"/>
+                            <field name="balance_variance"
+                                   decoration-danger="abs(balance_variance) &gt; 1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Transactions" name="transactions">
+                            <field name="transaction_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="invoice_number"/>
+                                    <field name="product_type"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="amount"/>
+                                    <field name="shift_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_credit_customer" model="ir.actions.act_window">
+        <field name="name">Credit Customers</field>
+        <field name="res_model">forecourt.credit.customer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

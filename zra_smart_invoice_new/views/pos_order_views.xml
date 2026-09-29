@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- POS Order Form View -->
+        <record id="view_pos_order_form_zra" model="ir.ui.view">
+            <field name="name">pos.order.form.zra</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <group string="ZRA Information" name="zra_info">
+                        <field name="zra_sync_status" readonly="1"/>
+                        <field name="zra_receipt_number" readonly="1"/>
+                        <field name="zra_invoice_number" readonly="1"/>
+                        <field name="zra_internal_data" readonly="1"/>
+                        <field name="zra_signature" readonly="1"/>
+                        <field name="zra_sdc_id" readonly="1"/>
+                        <field name="zra_mrc_no" readonly="1"/>
+                        <field name="zra_sync_date" readonly="1"/>
+                        <field name="zra_error_message" readonly="1" invisible="not zra_error_message"/>
+                    </group>
+                </xpath>
+                
+                <!-- Add ZRA QR Code if available -->
+                <xpath expr="//sheet" position="inside">
+                    <field name="zra_qr_code_image" widget="image" 
+                           invisible="not zra_qr_code_image"
+                           options="{'preview_image': 'image', 'size': [90, 90]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- POS Order List View -->
+        <record id="view_pos_order_tree_zra" model="ir.ui.view">
+            <field name="name">pos.order.tree.zra</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="zra_sync_status"/>
+                    <field name="zra_receipt_number"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- POS Order Search View -->
+        <record id="view_pos_order_filter_zra" model="ir.ui.view">
+            <field name="name">pos.order.filter.zra</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <separator/>
+                    <filter string="ZRA Synced" name="zra_synced" domain="[('zra_sync_status', '=', 'synced')]"/>
+                    <filter string="ZRA Pending" name="zra_pending" domain="[('zra_sync_status', '=', 'pending')]"/>
+                    <filter string="ZRA Failed" name="zra_failed" domain="[('zra_sync_status', '=', 'failed')]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="ZRA Status" name="group_zra_status" context="{'group_by': 'zra_sync_status'}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

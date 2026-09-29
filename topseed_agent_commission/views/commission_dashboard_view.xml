@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commission_dashboard_form" model="ir.ui.view">
+        <field name="name">topseed.commission.dashboard.form</field>
+        <field name="model">topseed.commission.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Agent Dashboard">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Commission Dashboard</h1>
+                    </div>
+                    
+                    <group string="Statistics">
+                        <group>
+                            <field name="total_agents" string="Total Agents" widget="integer"/>
+                            <field name="total_commissions" string="Total Commissions" widget="monetary"/>
+                            <field name="pending_commissions" string="Pending Commissions" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="paid_commissions" string="Paid Commissions" widget="monetary"/>
+                            <field name="average_commission" string="Average Commission" widget="monetary"/>
+                            <field name="top_agent" string="Top Agent"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Top Performing Agents">
+                        <field name="top_agent_ids" nolabel="1">
+                            <tree string="Agents">
+                                <field name="name"/>
+                                <field name="agent_rank"/>
+                                <field name="agent_total_sales" sum="Total Sales"/>
+                                <field name="agent_total_commission" sum="Total Commission"/>
+                            </tree>
+                        </field>
+                    </group>
+                    
+                    <group string="Recent Commission Lines">
+                        <field name="recent_line_ids" nolabel="1">
+                            <tree string="Recent Commissions">
+                                <field name="agent_id"/>
+                                <field name="product_id"/>
+                                <field name="sale_amount"/>
+                                <field name="commission_amount"/>
+                                <field name="state"/>
+                                <field name="date"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_commission_dashboard" model="ir.actions.act_window">
+        <field name="name">Agent Dashboard</field>
+        <field name="res_model">topseed.commission.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

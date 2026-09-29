@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_forecourt_shift_fuel_entry"
+              name="Shift Fuel Entries"
+              parent="forecourt_operations.menu_forecourt_reports"
+              action="action_forecourt_shift_fuel_entry"
+              sequence="35"/>
+
+    <menuitem id="menu_forecourt_fuel_rate"
+              name="Pump Rates"
+              parent="forecourt_operations.menu_forecourt_config"
+              action="action_forecourt_fuel_rate"
+              sequence="20"
+              groups="forecourt_operations.group_forecourt_manager"/>
+</odoo>

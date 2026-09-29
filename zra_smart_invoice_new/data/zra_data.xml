@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Default ZRA Configuration Template -->
+        <!-- This is just a template, actual config is created by user -->
+        
+    </data>
+</odoo>

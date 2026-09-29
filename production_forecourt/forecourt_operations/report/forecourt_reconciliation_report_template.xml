@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_forecourt_reconciliation_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="data"    t-value="docs[0].get_report_values()"/>
+                <t t-set="lines"   t-value="data['lines']"/>
+                <t t-set="company" t-value="data['company']"/>
+                <t t-set="wizard"  t-value="data['wizard']"/>
+
+                <div class="page">
+                    <div style="margin-bottom:6px; line-height:1.6;">
+                        <div><strong style="font-size:13px;" t-esc="company.name"/></div>
+                        <div t-esc="company.street or ''"/>
+                        <div t-esc="company.city or ''"/>
+                        <div>TPIN: <t t-esc="company.vat or ''"/></div>
+                    </div>
+
+                    <div style="margin-bottom:2px;"><strong style="font-size:13px;">Tank Reconciliation Report</strong></div>
+                    <div style="margin-bottom:10px; font-style:italic; font-weight:bold;">
+                        <t t-esc="wizard.date_from"/> to <t t-esc="wizard.date_to"/>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; font-size:9px;">
+                        <thead>
+                            <tr style="background:#D9D9D9; font-weight:bold; text-align:center;">
+                                <th style="border:1px solid #000; padding:3px; width:12%;">Tank</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Product</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Opening Dip (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Deliveries (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Sales (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Meter Vol. (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Expected Close (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Actual Close (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:9%;">Dip Var. (L)</th>
+                                <th style="border:1px solid #000; padding:3px; width:9%;">Meter Var. (L)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="lines" t-as="line">
+                                <tr>
+                                    <td style="border:1px solid #000; padding:2px; font-weight:bold;" t-esc="line['tank']"/>
+                                    <td style="border:1px solid #000; padding:2px;" t-esc="line['product']"/>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % line['opening_dip']"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % line['deliveries']"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % line['sales_litres']"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % line['meter_volume']"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % line['expected_closing']"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % line['actual_closing']"/>
+                                    </td>
+                                    <!-- Variance: colour red if loss, green if gain -->
+                                    <td t-attf-style="border:1px solid #000; padding:2px; text-align:right; font-weight:bold; color:{{ '#C00000' if line['dip_variance'] &lt; 0 else '#276221' }};">
+                                        <t t-esc="'%.2f' % line['dip_variance']"/>
+                                    </td>
+                                    <td t-attf-style="border:1px solid #000; padding:2px; text-align:right; font-weight:bold; color:{{ '#C00000' if line['meter_variance'] &lt; 0 else '#276221' }};">
+                                        <t t-esc="'%.2f' % line['meter_variance']"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top:10px; font-size:8px; color:#555;">
+                        Dip Variance = Actual Closing Dip âˆ’ Expected Closing (positive = gain, negative = loss/shrinkage).<br/>
+                        Meter Variance = Sales (system) âˆ’ Meter Volume (positive = unmetered sales, negative = meter over-reading).
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

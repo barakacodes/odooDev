@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. ROOT MENU (No external parent, no icon - just pure text) -->
+    <menuitem id="menu_forecourt_root"
+              name="Forecourt"
+              sequence="50"
+              groups="forecourt_operations.group_forecourt_user"/>
+
+    <!-- 2. OPERATIONS -->
+    <menuitem id="menu_forecourt_operations"
+              name="Operations"
+              parent="menu_forecourt_root"
+              sequence="10"/>
+
+    <menuitem id="menu_forecourt_shift"
+              name="Shifts"
+              parent="menu_forecourt_operations"
+              action="action_forecourt_shift"
+              sequence="10"/>
+
+    <menuitem id="menu_forecourt_cash_recon"
+              name="Cash Reconciliation"
+              parent="menu_forecourt_operations"
+              action="action_forecourt_cash_reconciliation"
+              sequence="20"
+              groups="forecourt_operations.group_forecourt_supervisor"/>
+
+    <!-- 3. INVENTORY -->
+    <menuitem id="menu_forecourt_inventory"
+              name="Inventory"
+              parent="menu_forecourt_root"
+              sequence="20"/>
+
+    <menuitem id="menu_forecourt_tank"
+              name="Tanks"
+              parent="menu_forecourt_inventory"
+              action="action_forecourt_tank"
+              sequence="10"/>
+
+    <menuitem id="menu_forecourt_delivery"
+              name="Deliveries"
+              parent="menu_forecourt_inventory"
+              action="action_forecourt_delivery"
+              sequence="20"/>
+
+    <!-- 4. CONFIGURATION -->
+    <menuitem id="menu_forecourt_config"
+              name="Configuration"
+              parent="menu_forecourt_root"
+              sequence="30"
+              groups="forecourt_operations.group_forecourt_manager"/>
+
+    <menuitem id="menu_forecourt_branch"
+              name="Branches"
+              parent="menu_forecourt_config"
+              action="action_forecourt_branch"
+              sequence="10"/>
+
+    <menuitem id="menu_forecourt_pump"
+              name="Pumps &amp; Nozzles"
+              parent="menu_forecourt_config"
+              action="action_forecourt_pump"
+              sequence="20"/>
+
+    <menuitem id="menu_forecourt_targets"
+              name="Monthly Targets"
+              parent="menu_forecourt_config"
+              action="action_forecourt_target"
+              sequence="30"/>
+
+    <!-- 5. REPORTS -->
+    <menuitem id="menu_forecourt_reports"
+              name="Reports"
+              parent="menu_forecourt_root"
+              sequence="40"
+              groups="forecourt_operations.group_forecourt_supervisor"/>
+
+    <menuitem id="menu_forecourt_product_overview"
+              name="Product Overview"
+              parent="menu_forecourt_reports"
+              action="action_forecourt_product_overview"
+              sequence="10"/>
+</odoo>

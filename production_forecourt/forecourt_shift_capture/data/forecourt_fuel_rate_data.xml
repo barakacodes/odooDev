@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Seed the initial pump rate per the task spec (18 May 2026).
+             Update by adding a new effective-dated record; do not edit this. -->
+        <record id="forecourt_fuel_rate_initial" model="forecourt.fuel.rate">
+            <field name="effective_date" eval="'2026-05-18'"/>
+            <field name="petrol_rate">27.15</field>
+            <field name="diesel_rate">33.99</field>
+            <field name="notes">Initial seed (per 18-MAY-2026 task spec).</field>
+        </record>
+    </data>
+</odoo>

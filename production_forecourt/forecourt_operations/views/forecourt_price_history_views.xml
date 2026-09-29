@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_price_history_list" model="ir.ui.view">
+        <field name="name">forecourt.fuel.price.history.list</field>
+        <field name="model">forecourt.fuel.price.history</field>
+        <field name="arch" type="xml">
+            <list string="Price History" default_order="change_date desc" create="false" edit="false">
+                <field name="change_date"/>
+                <field name="product_id"/>
+                <field name="forecourt_product_type"/>
+                <field name="old_price"/>
+                <field name="new_price"/>
+                <field name="price_change" decoration-danger="price_change &gt; 0" decoration-success="price_change &lt; 0"/>
+                <field name="changed_by"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_price_history_graph" model="ir.ui.view">
+        <field name="name">forecourt.fuel.price.history.graph</field>
+        <field name="model">forecourt.fuel.price.history</field>
+        <field name="arch" type="xml">
+            <graph string="Price Trend" type="line">
+                <field name="change_date" interval="day"/>
+                <field name="new_price" type="measure"/>
+                <field name="product_id"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_forecourt_price_history" model="ir.actions.act_window">
+        <field name="name">Price History</field>
+        <field name="res_model">forecourt.fuel.price.history</field>
+        <field name="view_mode">list,graph</field>
+    </record>
+
+    <record id="view_forecourt_monthly_price_update_list" model="ir.ui.view">
+        <field name="name">forecourt.monthly.price.update.list</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list string="Monthly Price Update" editable="bottom" create="false" delete="false">
+                <field name="default_code" string="Code" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="forecourt_product_type" readonly="1"/>
+                <field name="list_price" readonly="1" string="Sale Price"/>
+                <field name="standard_price" readonly="1" string="Cost"/>
+                <field name="forecourt_selling_price" string="Forecourt Price (ZMW)"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_forecourt_monthly_price_update" model="ir.actions.act_window">
+        <field name="name">Monthly Price Update</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('forecourt_product_type', 'in', ['fuel', 'lpg', 'lubricant'])]</field>
+        <field name="view_id" ref="view_forecourt_monthly_price_update_list"/>
+    </record>
+</odoo>

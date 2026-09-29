@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Commission Payment Sequence -->
+        <record id="seq_topseed_commission_payment" model="ir.sequence">
+            <field name="name">TopSeed Commission Payment</field>
+            <field name="code">topseed.commission.payment</field>
+            <field name="prefix">COMM-PAY-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Default Commission Configuration -->
+        <record id="default_commission_config" model="topseed.commission.config">
+            <field name="name">Default Commission Configuration</field>
+            <field name="commission_product_id" ref="product.product_product_consultant"/>
+            <field name="commission_account_id" ref="account.data_account_type_expenses"/>
+            <field name="commission_journal_id" ref="account.accounts_journal"/>
+            <field name="default_rate">5.0</field>
+            <field name="calculation_method">percentage</field>
+            <field name="calculation_basis">total</field>
+            <field name="commission_due_days">30</field>
+            <field name="auto_approve_commission">True</field>
+            <field name="commission_threshold">0.0</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

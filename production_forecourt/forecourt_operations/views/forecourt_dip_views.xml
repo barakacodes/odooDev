@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_dip_list" model="ir.ui.view">
+        <field name="name">forecourt.dip.reading.list</field>
+        <field name="model">forecourt.dip.reading</field>
+        <field name="arch" type="xml">
+            <list string="Dip Readings">
+                <field name="name"/>
+                <field name="reading_datetime"/>
+                <field name="tank_id"/>
+                <field name="product_id"/>
+                <field name="reading_type" widget="badge"
+                       decoration-success="reading_type=='opening'"
+                       decoration-warning="reading_type=='closing'"
+                       decoration-info="reading_type=='mid_shift'"/>
+                <field name="shift_id" optional="show"/>
+                <field name="dip_mm"/>
+                <field name="litres"/>
+                <field name="recorded_by"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_dip_form" model="ir.ui.view">
+        <field name="name">forecourt.dip.reading.form</field>
+        <field name="model">forecourt.dip.reading</field>
+        <field name="arch" type="xml">
+            <form string="Tank Dip Reading">
+                <header>
+                    <button name="action_update_tank_level"
+                            string="Set as Current Tank Level"
+                            type="object" class="btn-secondary"
+                            confirm="Update the tank's current level to this reading?"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Reading Details">
+                            <field name="reading_datetime"/>
+                            <field name="tank_id"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="reading_type"/>
+                            <field name="shift_id"/>
+                        </group>
+                        <group string="Measurements">
+                            <field name="dip_mm"/>
+                            <field name="litres"
+                                   help="Litres from the tank's dip chart for this mm reading"/>
+                            <field name="recorded_by"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes…"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_forecourt_dip_search" model="ir.ui.view">
+        <field name="name">forecourt.dip.reading.search</field>
+        <field name="model">forecourt.dip.reading</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="tank_id"/>
+                <field name="recorded_by"/>
+                <filter name="opening" string="Opening Readings"
+                        domain="[('reading_type','=','opening')]"/>
+                <filter name="closing" string="Closing Readings"
+                        domain="[('reading_type','=','closing')]"/>
+                <filter name="today" string="Today"
+                        domain="[('reading_datetime','&gt;=',datetime.datetime.now().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_tank" string="Tank"
+                            context="{'group_by': 'tank_id'}"/>
+                    <filter name="group_type" string="Reading Type"
+                            context="{'group_by': 'reading_type'}"/>
+                    <filter name="group_date" string="Date"
+                            context="{'group_by': 'reading_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_forecourt_dip" model="ir.actions.act_window">
+        <field name="name">Dip Readings</field>
+        <field name="res_model">forecourt.dip.reading</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

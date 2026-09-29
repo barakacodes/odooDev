@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Branch User sync (checklist #6) -->
+    <record id="view_users_form_inherit_zra" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.zra</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_save_as_zra_branch_user" type="object"
+                        class="oe_stat_button" icon="fa-id-badge"
+                        invisible="zra_branch_user_synced">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Save as ZRA Branch User</span>
+                    </div>
+                </button>
+                <div class="oe_stat_button" invisible="not zra_branch_user_synced">
+                    <div class="o_field_widget o_stat_info">
+                        <i class="fa fa-check-circle text-success"/>
+                        <span class="o_stat_text">ZRA Branch User</span>
+                    </div>
+                </div>
+            </div>
+        </field>
+    </record>
+
+</odoo>

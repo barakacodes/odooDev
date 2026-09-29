@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_template_form_inherit_zra" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.zra</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_register_with_zra" type="object"
+                        string="Register with ZRA" class="btn-primary"
+                        invisible="zra_registered or not zra_classification_code"/>
+                <button name="action_update_zra_item" type="object"
+                        string="Update on ZRA" class="btn-secondary"
+                        invisible="not zra_registered"/>
+            </xpath>
+
+            <xpath expr="//page[@name='general_information']" position="after">
+                <page string="ZRA Information" name="zra_info">
+
+                    <!-- Registration status banner -->
+                    <div class="alert alert-success mb-3" role="alert"
+                         invisible="not zra_registered">
+                        <strong>✔ Registered with ZRA</strong>
+                        — Item Code: <field name="zra_item_code" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-warning mb-3" role="alert"
+                         invisible="zra_registered">
+                        <strong>Not yet registered with ZRA.</strong>
+                        Fill in all required fields below, then click "Register with ZRA".
+                    </div>
+
+                    <group>
+                        <!-- PARITY #3: Origin + packaging now mandatory -->
+                        <group string="Classification &amp; Tax">
+                            <field name="zra_item_code" placeholder="Auto-generated if blank"/>
+                            <field name="zra_classification_id"
+                                   options="{'no_create': True}"
+                                   placeholder="Pick from synced UNSPSC codes (optional)"/>
+                            <field name="zra_classification_code"
+                                   placeholder="e.g. 15000000"
+                                   required="1"/>
+                            <field name="zra_item_type"/>
+                            <field name="zra_tax_type"/>
+                            <field name="zra_secondary_tax_type"/>
+                            <field name="zra_sale_type"/>
+                        </group>
+                        <group string="Origin &amp; Packaging">
+                            <!-- PARITY #3: country of origin — required before registration -->
+                            <field name="zra_origin_country_id"
+                                   options="{'no_create': True}"
+                                   placeholder="Select country of origin"
+                                   required="1"/>
+                            <field name="zra_pkg_unit_code" required="1"/>
+                            <field name="zra_qty_unit_code" required="1"/>
+                            <field name="zra_safety_qty"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="MTV / Manufacturer Details"
+                               invisible="zra_tax_type != 'B'">
+                            <field name="zra_manufacturer_tpin" required="zra_tax_type == 'B'"/>
+                            <field name="zra_manufacturer_item_code" required="zra_tax_type == 'B'"/>
+                            <field name="zra_rrp" required="zra_tax_type == 'B'"/>
+                        </group>
+                        <group string="Other Flags">
+                            <field name="zra_has_service_charge"/>
+                            <field name="zra_is_rental"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Registration Status">
+                            <field name="zra_registered" readonly="1"/>
+                            <field name="zra_registration_date" readonly="1"/>
+                        </group>
+                        <group string="Help">
+                            <div class="alert alert-info" role="alert">
+                                <strong>Required before ZRA registration:</strong>
+                                <ul class="mb-0 mt-1">
+                                    <li>UNSPSC Classification Code (8 digits)</li>
+                                    <li>Country of Origin (ZM for local goods)</li>
+                                    <li>Packaging Unit (e.g. NT = Unit, BX = Box)</li>
+                                    <li>Quantity Unit (e.g. U = Unit, KG = Kilogram)</li>
+                                    <li>Manufacturer TPIN, Item Code &amp; RRP (MTV / type B items only)</li>
+                                </ul>
+                            </div>
+                        </group>
+                    </group>
+
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Bulk register server action -->
+    <record id="action_product_bulk_register_zra" model="ir.actions.server">
+        <field name="name">Bulk Register with ZRA</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_bulk_register_with_zra()
+        </field>
+    </record>
+
+    <!-- Expose ZRA fields as multi-editable columns on the Products list,
+         so many products can be selected and updated together in one go
+         (list already has multi_edit="1" in product.product_template_tree_view). -->
+    <record id="view_product_template_tree_inherit_zra" model="ir.ui.view">
+        <field name="name">product.template.list.inherit.zra</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="categ_id" position="after">
+                <field name="zra_classification_code" optional="show" string="UNSPSC Code"/>
+                <field name="zra_tax_type" optional="hide" string="ZRA Tax Type"/>
+                <field name="zra_origin_country_id" optional="hide" string="ZRA Origin"/>
+                <field name="zra_pkg_unit_code" optional="hide" string="ZRA Pkg Unit"/>
+                <field name="zra_qty_unit_code" optional="hide" string="ZRA Qty Unit"/>
+                <field name="zra_registered" optional="show" string="ZRA Registered"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,429 @@
+# -*- coding: utf-8 -*-
+import re
+from datetime import datetime
+from odoo import models, fields, api
+from odoo.exceptions import UserError
+
+
+def _parse_number(raw):
+    if not raw:
+        return 0.0
+    raw = raw.strip()
+    raw = re.sub(r'^[Kk]\s*', '', raw)
+    m = re.match(r'([0-9,\.\s]+)', raw)
+    if m:
+        raw = m.group(1).strip()
+    raw = re.sub(r'(\d)\s+(\d)', r'\1.\2', raw)
+    raw = raw.replace(',', '').rstrip('.')
+    try:
+        return float(raw)
+    except ValueError:
+        return 0.0
+
+
+def _parse_report(text):
+    lines = [l.strip() for l in text.strip().splitlines()]
+    lines = [l for l in lines if l]
+    result = {}
+
+    SECTION_HEADERS = [
+        'opening stock', 'total sales', 'credit sale', 'test transfer',
+        'cash sales', 'total fuel cash', 'accessories', 'received stock',
+        'closing stock', 'pos', 'fuel cash'
+    ]
+
+    def is_section_header(line):
+        l = line.lower().strip()
+        return any(l.startswith(h) for h in SECTION_HEADERS)
+
+    def find_line(pattern, start=0):
+        for i in range(start, len(lines)):
+            if re.search(pattern, lines[i], re.IGNORECASE):
+                return i
+        return -1
+
+    def get_ulp_lsd(section_idx):
+        ulp = lsd = 0.0
+        found_ulp = found_lsd = False
+        for i in range(section_idx + 1, min(section_idx + 8, len(lines))):
+            line = lines[i]
+            if i > section_idx + 1 and is_section_header(line):
+                break
+            m = re.match(r'ulp\s*=\s*(.*)', line, re.IGNORECASE)
+            if m:
+                ulp = _parse_number(m.group(1))
+                found_ulp = True
+            m = re.match(r'lsd\s*=\s*(.*)', line, re.IGNORECASE)
+            if m:
+                lsd = _parse_number(m.group(1))
+                found_lsd = True
+            if found_ulp and found_lsd:
+                break
+        return ulp, lsd
+
+    def get_k_value(line):
+        m = re.search(r'=\s*[Kk]\s*([0-9][0-9,.]*)', line)
+        if m and m.group(1):
+            return _parse_number(m.group(1))
+        m = re.search(r'^[Kk]\s*=\s*([0-9,\.]+)', line.strip())
+        if m:
+            return _parse_number(m.group(1))
+        return 0.0
+
+    # Supervisor name
+    for i, line in enumerate(lines[:5]):
+        if re.search(r'shift', line, re.IGNORECASE) and not re.search(r'\d{2}/\d{2}/\d{4}', line):
+            m = re.match(r'(.+?)[\'\']?s?\s+shift', line, re.IGNORECASE)
+            if m:
+                result['supervisor_name'] = m.group(1).strip()
+                break
+    if 'supervisor_name' not in result:
+        result['supervisor_name'] = 'Unknown'
+
+    # Date and shift type
+    date_line_idx = find_line(r'\d{2}/\d{2}/\d{4}')
+    if date_line_idx < 0:
+        raise UserError("Invalid format: Cannot find date line (expected DD/MM/YYYY).")
+    date_line = lines[date_line_idx]
+    date_match = re.search(r'(\d{2}/\d{2}/\d{4})', date_line)
+    if not date_match:
+        raise UserError(f"Invalid format: Date not found in line: {date_line}")
+    try:
+        result['date'] = datetime.strptime(date_match.group(1), '%d/%m/%Y').date()
+    except ValueError:
+        raise UserError(f"Invalid date: {date_match.group(1)}")
+
+    if re.search(r'night', date_line, re.IGNORECASE):
+        result['shift_type'] = 'night'
+    elif re.search(r'day', date_line, re.IGNORECASE):
+        result['shift_type'] = 'day'
+    else:
+        raise UserError(f"Invalid format: Cannot determine shift type from: {date_line}")
+
+    # Opening stock
+    opening_idx = find_line(r'opening\s+stock')
+    if opening_idx < 0:
+        raise UserError("Invalid format: Missing 'opening stock' section.")
+    result['opening_ulp'], result['opening_lsd'] = get_ulp_lsd(opening_idx)
+
+    # Total sales
+    total_sales_idx = find_line(r'total\s+sales')
+    if total_sales_idx < 0:
+        raise UserError("Invalid format: Missing 'total sales' section.")
+    result['total_sales_ulp'], result['total_sales_lsd'] = get_ulp_lsd(total_sales_idx)
+
+    # Credit sales
+    credit_idx = find_line(r'credit\s+sale')
+    if credit_idx < 0:
+        raise UserError("Invalid format: Missing 'credit sale' section.")
+    result['credit_ulp'], result['credit_lsd'] = get_ulp_lsd(credit_idx)
+
+    # Test transfer
+    test_idx = find_line(r'test\s+transfer')
+    if test_idx >= 0:
+        result['test_ulp'], result['test_lsd'] = get_ulp_lsd(test_idx)
+    else:
+        result['test_ulp'] = result['test_lsd'] = 0.0
+
+    # Cash sales
+    cash_sales_idx = find_line(r'cash\s+sales')
+    if cash_sales_idx < 0:
+        raise UserError("Invalid format: Missing 'cash sales' section.")
+    result['cash_ulp'], result['cash_lsd'] = get_ulp_lsd(cash_sales_idx)
+
+    # Total fuel cash
+    fuel_cash_idx = find_line(r'total\s+fuel\s+cash')
+    if fuel_cash_idx < 0:
+        raise UserError("Invalid format: Missing 'total fuel cash' section.")
+    result['fuel_cash_k'] = get_k_value(lines[fuel_cash_idx])
+    if not result['fuel_cash_k'] and fuel_cash_idx + 1 < len(lines):
+        result['fuel_cash_k'] = get_k_value(lines[fuel_cash_idx + 1])
+
+    # POS
+    pos_idx = find_line(r'^pos\s*$')
+    if pos_idx >= 0 and pos_idx + 1 < len(lines):
+        result['pos_k'] = get_k_value(lines[pos_idx + 1])
+    else:
+        pos_idx2 = find_line(r'^pos\s*[Kk]\s*=')
+        result['pos_k'] = get_k_value(lines[pos_idx2]) if pos_idx2 >= 0 else 0.0
+
+    # Fuel cash at hand
+    hand_idx = find_line(r'fuel\s+cash\s+@\s+hand')
+    if hand_idx >= 0:
+        result['cash_at_hand_k'] = get_k_value(lines[hand_idx])
+        if not result['cash_at_hand_k'] and hand_idx + 1 < len(lines):
+            result['cash_at_hand_k'] = get_k_value(lines[hand_idx + 1])
+    else:
+        result['cash_at_hand_k'] = result['fuel_cash_k']
+
+    # Accessories
+    acc_idx = find_line(r'accessories')
+    result['lubes_k'] = result['lpg_k'] = 0.0
+    if acc_idx >= 0:
+        for i in range(acc_idx + 1, min(acc_idx + 4, len(lines))):
+            line = lines[i]
+            if re.search(r'lube', line, re.IGNORECASE):
+                m = re.search(r'=\s*[Kk]?\s*([0-9][0-9,.]*)', line)
+                result['lubes_k'] = _parse_number(m.group(1)) if m and m.group(1) else 0.0
+            if re.search(r'lpg', line, re.IGNORECASE):
+                m = re.search(r'=\s*[Kk]?\s*([0-9][0-9,.]*)', line)
+                result['lpg_k'] = _parse_number(m.group(1)) if m and m.group(1) else 0.0
+
+    # Received stock
+    recv_idx = find_line(r'received\s+stock')
+    if recv_idx >= 0:
+        result['recv_ulp'], result['recv_lsd'] = get_ulp_lsd(recv_idx)
+    else:
+        result['recv_ulp'] = result['recv_lsd'] = 0.0
+
+    # Closing stocks
+    close_idx = find_line(r'closing\s+stock')
+    if close_idx < 0:
+        raise UserError("Invalid format: Missing 'closing stocks' section.")
+    result['closing_ulp'], result['closing_lsd'] = get_ulp_lsd(close_idx)
+
+    # Loss/Gain
+    loss_idx = find_line(r'loss\s*=')
+    result['loss'] = 0.0
+    if loss_idx >= 0:
+        m = re.search(r'loss\s*=\s*([+-]?[0-9,.]+)', lines[loss_idx], re.IGNORECASE)
+        if m:
+            result['loss'] = _parse_number(m.group(1))
+
+    return result
+
+
+def _create_shift_records(env, branch, data):
+    from datetime import datetime, time, timedelta
+    shift_date = data['date']
+    supervisor = env['res.users'].search(
+        [('name', 'ilike', data['supervisor_name'])], limit=1
+    ) or env.user
+    if data['shift_type'] == 'day':
+        start_dt = datetime.combine(shift_date, time(6, 0))
+        end_dt = datetime.combine(shift_date, time(18, 0))
+    else:
+        start_dt = datetime.combine(shift_date, time(18, 0))
+        end_dt = datetime.combine(shift_date + timedelta(days=1), time(6, 0))
+    shift = env['forecourt.shift'].create({
+        'branch': branch,
+        'shift_type': data['shift_type'],
+        'date_start': start_dt,
+        'date_end': end_dt,
+        'supervisor_id': supervisor.id,
+        'state': 'closed',
+        'cash_on_hand_kwacha': data['cash_at_hand_k'],
+        'pos_account_kwacha': data['pos_k'],
+        'lube_sales_kwacha': data['lubes_k'],
+        'lpg_sales_kwacha': data['lpg_k'],
+    })
+    Rate = env['forecourt.fuel.rate']
+    p_rate, d_rate = Rate.sudo().get_rate_for(shift_date, env['res.company'].sudo().browse(3))
+    env['forecourt.shift.fuel.entry'].create({
+        'shift_id': shift.id, 'fuel_type': 'petrol',
+        'opening_stock_litres': data['opening_ulp'],
+        'received_stock_litres': data['recv_ulp'],
+        'total_sold_litres': data['total_sales_ulp'],
+        'credit_litres_sold': data['credit_ulp'],
+        'cash_sales_litres': data['cash_ulp'],
+        'test_stock_litres': data['test_ulp'],
+        'closing_stock_litres': data['closing_ulp'],
+        'rate': p_rate, 'cash_sales_value': data['cash_ulp'] * p_rate,
+    })
+    env['forecourt.shift.fuel.entry'].create({
+        'shift_id': shift.id, 'fuel_type': 'diesel',
+        'opening_stock_litres': data['opening_lsd'],
+        'received_stock_litres': data['recv_lsd'],
+        'total_sold_litres': data['total_sales_lsd'],
+        'credit_litres_sold': data['credit_lsd'],
+        'cash_sales_litres': data['cash_lsd'],
+        'test_stock_litres': data['test_lsd'],
+        'closing_stock_litres': data['closing_lsd'],
+        'rate': d_rate, 'cash_sales_value': data['cash_lsd'] * d_rate,
+    })
+    return shift
+
+
+class ForecourtImportWizard(models.TransientModel):
+    _name = 'forecourt.import.wizard'
+    _description = 'Import WhatsApp Shift Report'
+
+    branch = fields.Selection([
+        ('arcades', 'Arcades'),
+        ('luanshya', 'Luanshya'),
+        ('chililabombwe', 'Chililabombwe'),
+    ], string='Branch', required=True)
+
+    bulk_mode = fields.Boolean(string='Bulk Import (multiple reports)', default=False)
+    report_text = fields.Text(string='Paste Report', required=True)
+    preview_lines = fields.Text(string='Preview / Validation', readonly=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('validated', 'Validated'),
+        ('error', 'Error'),
+    ], default='draft')
+    parsed_data = fields.Text(string='Parsed Data (JSON)', readonly=True)
+    show_original = fields.Boolean(string='Show Original', default=False)
+
+    parsed_supervisor = fields.Char(string='Supervisor', compute='_compute_parsed', readonly=True)
+    parsed_date       = fields.Char(string='Date', compute='_compute_parsed', readonly=True)
+    parsed_shift_type = fields.Char(string='Shift Type', compute='_compute_parsed', readonly=True)
+    p_opening    = fields.Float(string='Opening Stock ULP (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    p_received   = fields.Float(string='Received Stock ULP (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    p_total_sold = fields.Float(string='Total Sold ULP (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    p_credit     = fields.Float(string='Credit Sold ULP (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    p_cash_sales = fields.Float(string='Cash Sales ULP (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    p_closing    = fields.Float(string='Closing Stock ULP (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    d_opening    = fields.Float(string='Opening Stock LSD (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    d_received   = fields.Float(string='Received Stock LSD (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    d_total_sold = fields.Float(string='Total Sold LSD (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    d_credit     = fields.Float(string='Credit Sold LSD (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    d_cash_sales = fields.Float(string='Cash Sales LSD (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    d_closing    = fields.Float(string='Closing Stock LSD (L)', digits=(16,3), compute='_compute_parsed', readonly=True)
+    p_fuel_cash    = fields.Float(string='Fuel Cash (K)', digits=(16,2), compute='_compute_parsed', readonly=True)
+    p_pos          = fields.Float(string='POS / Card (K)', digits=(16,2), compute='_compute_parsed', readonly=True)
+    p_cash_at_hand = fields.Float(string='Cash @ Hand (K)', digits=(16,2), compute='_compute_parsed', readonly=True)
+    p_lubes        = fields.Float(string='Lube Sales (K)', digits=(16,2), compute='_compute_parsed', readonly=True)
+    p_lpg          = fields.Float(string='LPG Sales (K)', digits=(16,2), compute='_compute_parsed', readonly=True)
+    p_loss         = fields.Float(string='Loss / Gain (L)', digits=(16,2), compute='_compute_parsed', readonly=True)
+
+    @api.depends('parsed_data')
+    def _compute_parsed(self):
+        import json
+        for rec in self:
+            d = {}
+            if rec.parsed_data:
+                try:
+                    d = json.loads(rec.parsed_data)
+                except Exception:
+                    pass
+            rec.parsed_supervisor = d.get('supervisor_name', '')
+            rec.parsed_date       = d.get('date', '')
+            rec.parsed_shift_type = d.get('shift_type', '').upper() if d.get('shift_type') else ''
+            rec.p_opening    = float(d.get('opening_ulp', 0))
+            rec.p_received   = float(d.get('recv_ulp', 0))
+            rec.p_total_sold = float(d.get('total_sales_ulp', 0))
+            rec.p_credit     = float(d.get('credit_ulp', 0))
+            rec.p_cash_sales = float(d.get('cash_ulp', 0))
+            rec.p_closing    = float(d.get('closing_ulp', 0))
+            rec.d_opening    = float(d.get('opening_lsd', 0))
+            rec.d_received   = float(d.get('recv_lsd', 0))
+            rec.d_total_sold = float(d.get('total_sales_lsd', 0))
+            rec.d_credit     = float(d.get('credit_lsd', 0))
+            rec.d_cash_sales = float(d.get('cash_lsd', 0))
+            rec.d_closing    = float(d.get('closing_lsd', 0))
+            rec.p_fuel_cash    = float(d.get('fuel_cash_k', 0))
+            rec.p_pos          = float(d.get('pos_k', 0))
+            rec.p_cash_at_hand = float(d.get('cash_at_hand_k', 0))
+            rec.p_lubes        = float(d.get('lubes_k', 0))
+            rec.p_lpg          = float(d.get('lpg_k', 0))
+            rec.p_loss         = float(d.get('loss', 0))
+
+    def _return_self(self):
+        return {'type': 'ir.actions.act_window', 'res_model': 'forecourt.import.wizard',
+                'res_id': self.id, 'view_mode': 'form', 'target': 'new'}
+
+    def action_show_original(self):
+        self.show_original = True
+        return self._return_self()
+
+    def action_hide_original(self):
+        self.show_original = False
+        return self._return_self()
+
+    def action_revalidate(self):
+        self.write({'state': 'draft', 'preview_lines': False, 'parsed_data': False})
+        return self._return_self()
+
+    def action_validate(self):
+        self.ensure_one()
+        import json
+        try:
+            data = _parse_report(self.report_text)
+            branch_label = dict(self._fields['branch'].selection).get(self.branch, self.branch)
+            preview = (
+                f"Supervisor: {data['supervisor_name']} | Branch: {branch_label} | "
+                f"Date: {data['date']} | Shift: {data['shift_type'].upper()}"
+            )
+            self.write({
+                'preview_lines': preview,
+                'parsed_data': json.dumps({k: str(v) for k, v in data.items()}, default=str),
+                'state': 'validated',
+            })
+        except UserError as e:
+            sep = "=" * 48
+            self.write({
+                'preview_lines': f"VALIDATION FAILED\n{sep}\nERROR: {e.args[0]}",
+                'state': 'error',
+            })
+        return self._return_self()
+
+    def action_import(self):
+        self.ensure_one()
+        if self.state != 'validated':
+            raise UserError('Please validate the report first.')
+        data = _parse_report(self.report_text)
+        shift_date = data['date']
+        existing = self.env['forecourt.shift'].search([
+            ('branch', '=', self.branch),
+            ('shift_type', '=', data['shift_type']),
+            ('date_start', '>=', str(shift_date) + ' 00:00:00'),
+            ('date_start', '<=', str(shift_date) + ' 23:59:59'),
+        ])
+        if existing:
+            raise UserError(
+                f"A {data['shift_type']} shift for {self.branch} on "
+                f"{shift_date.strftime('%d/%m/%Y')} already exists ({existing.name}). "
+                f"Import blocked to prevent duplicates."
+            )
+        shift = _create_shift_records(self.env, self.branch, data)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Shift {shift.name} imported',
+            'res_model': 'forecourt.shift',
+            'res_id': shift.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    def action_bulk_import(self):
+        self.ensure_one()
+        if not self.branch:
+            raise UserError('Please select a branch.')
+        import re as _re
+        text = self.report_text.strip()
+        blocks = _re.split(r'(?m)^(?=\S.*(?:zambia|petroleum|mines|limited|ltd))', text, flags=_re.IGNORECASE)
+        if len(blocks) <= 1:
+            blocks = _re.split(r'\n\s*\n\s*\n', text)
+        if len(blocks) <= 1:
+            blocks = _re.split(r'\n-{3,}\n', text)
+        blocks = [b.strip() for b in blocks if b.strip()]
+        results = []
+        imported = skipped = errors = 0
+        for i, block in enumerate(blocks, 1):
+            try:
+                data = _parse_report(block)
+                shift_date = data['date']
+                existing = self.env['forecourt.shift'].search([
+                    ('branch', '=', self.branch),
+                    ('shift_type', '=', data['shift_type']),
+                    ('date_start', '>=', str(shift_date) + ' 00:00:00'),
+                    ('date_start', '<=', str(shift_date) + ' 23:59:59'),
+                ])
+                if existing:
+                    results.append(f"SKIPPED: Report {i} ({data['date']} {data['shift_type'].upper()}) already exists ({existing.name})")
+                    skipped += 1
+                    continue
+                shift = _create_shift_records(self.env, self.branch, data)
+                results.append(f"IMPORTED: Report {i} ({data['supervisor_name']} | {data['date']} {data['shift_type'].upper()}) as {shift.name}")
+                imported += 1
+            except UserError as e:
+                results.append(f"FAILED: Report {i} — {e.args[0]}")
+                errors += 1
+            except Exception as e:
+                results.append(f"ERROR: Report {i} — {str(e)}")
+                errors += 1
+        summary = f"BULK IMPORT COMPLETE\nTotal: {len(blocks)} | Imported: {imported} | Skipped: {skipped} | Failed: {errors}\n\n"
+        summary += "\n".join(results)
+        self.write({'preview_lines': summary, 'state': 'validated' if errors == 0 else 'error'})
+        return self._return_self()

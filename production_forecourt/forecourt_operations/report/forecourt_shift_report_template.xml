@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_forecourt_shift_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="data"     t-value="docs[0].get_report_values()"/>
+                <t t-set="shift"    t-value="data['shift']"/>
+                <t t-set="company"  t-value="data['company']"/>
+                <t t-set="sales"    t-value="data['sales']"/>
+                <t t-set="totals"   t-value="data['payment_totals']"/>
+                <t t-set="type_map" t-value="{'fuel': 'Fuel', 'lpg': 'LPG', 'lubricant': 'Lubricant'}"/>
+                <t t-set="pay_map"  t-value="{'cash': 'Cash', 'mobile_money': 'Mobile Money', 'card': 'Card / POS', 'credit': 'Fleet / Credit'}"/>
+
+                <div class="page">
+                    <!-- Header -->
+                    <div style="margin-bottom:6px; line-height:1.6;">
+                        <div><strong style="font-size:13px;" t-esc="company.name"/></div>
+                        <div t-esc="company.street or ''"/>
+                        <div t-esc="company.city or ''"/>
+                        <div>TPIN: <t t-esc="company.vat or ''"/></div>
+                        <div>Email: <t t-esc="company.email or ''"/></div>
+                    </div>
+
+                    <div style="margin-bottom:2px;"><strong style="font-size:13px;">Forecourt Shift Report</strong></div>
+                    <div style="margin-bottom:2px; font-style:italic;">
+                        Shift: <t t-esc="shift.name"/> â€”
+                        <t t-esc="dict(shift._fields['shift_type'].selection).get(shift.shift_type, '')"/>
+                    </div>
+                    <div style="margin-bottom:2px;">
+                        Supervisor: <t t-esc="shift.supervisor_id.name"/>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        Period: <t t-esc="shift.date_start"/> to
+                        <t t-if="shift.date_end" t-esc="shift.date_end"/>
+                        <t t-else="">Open</t>
+                    </div>
+
+                    <!-- Sales table -->
+                    <table style="width:100%; border-collapse:collapse; font-size:9px;">
+                        <thead>
+                            <tr style="background:#D9D9D9; font-weight:bold; text-align:center;">
+                                <th style="border:1px solid #000; padding:3px; width:7%;">Time</th>
+                                <th style="border:1px solid #000; padding:3px; width:8%;">Ref</th>
+                                <th style="border:1px solid #000; padding:3px; width:8%;">Type</th>
+                                <th style="border:1px solid #000; padding:3px; width:16%;">Product</th>
+                                <th style="border:1px solid #000; padding:3px; width:9%;">Pump/Ref</th>
+                                <th style="border:1px solid #000; padding:3px; width:12%;">Cashier</th>
+                                <th style="border:1px solid #000; padding:3px; width:9%;">Payment</th>
+                                <th style="border:1px solid #000; padding:3px; width:7%;">Qty</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Unit Price</th>
+                                <th style="border:1px solid #000; padding:3px; width:10%;">Total (ZMW)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="sales" t-as="s">
+                                <tr>
+                                    <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                        <t t-esc="s.sale_datetime.strftime('%H:%M') if s.sale_datetime else ''"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px;" t-esc="s.name"/>
+                                    <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                        <t t-esc="type_map.get(s.product_type, s.product_type)"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px;">
+                                        <t t-esc="s.product_id.name if s.product_id else ''"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                        <t t-if="s.nozzle_id" t-esc="s.nozzle_id.name"/>
+                                        <t t-elif="s.pump_id" t-esc="s.pump_id.name"/>
+                                        <t t-else="">â€”</t>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px;">
+                                        <t t-esc="s.cashier_id.name if s.cashier_id else ''"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                        <t t-esc="pay_map.get(s.payment_method, s.payment_method)"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.3f' % s.quantity"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.4f' % s.unit_price"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right; font-weight:bold;">
+                                        <t t-esc="'%.4f' % s.total_amount"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot>
+                            <tr style="font-weight:bold; background:#F2F2F2;">
+                                <td colspan="9" style="border:1px solid #000; padding:3px; text-align:center;">Grand Total</td>
+                                <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                    <t t-esc="'%.4f' % data['total_revenue']"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <!-- Payment summary -->
+                    <div style="margin-top:16px; display:flex; gap:40px;">
+                        <div>
+                            <strong>Payment Breakdown</strong>
+                            <table style="border-collapse:collapse; font-size:9px; margin-top:4px; min-width:220px;">
+                                <t t-foreach="[('cash','Cash'),('mobile_money','Mobile Money'),('card','Card / POS'),('credit','Fleet / Credit')]" t-as="pm">
+                                    <tr>
+                                        <td style="border:1px solid #ccc; padding:3px 6px; width:140px;">
+                                            <t t-esc="pm[1]"/>
+                                        </td>
+                                        <td style="border:1px solid #ccc; padding:3px 6px; text-align:right; min-width:80px;">
+                                            <t t-esc="'%.4f' % (totals.get(pm[0], 0.0))"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr style="font-weight:bold; background:#F2F2F2;">
+                                    <td style="border:1px solid #ccc; padding:3px 6px;">Total</td>
+                                    <td style="border:1px solid #ccc; padding:3px 6px; text-align:right;">
+                                        <t t-esc="'%.4f' % data['total_revenue']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>
+                            <strong>Volume Summary</strong>
+                            <table style="border-collapse:collapse; font-size:9px; margin-top:4px; min-width:200px;">
+                                <tr>
+                                    <td style="border:1px solid #ccc; padding:3px 6px; width:140px;">Total Fuel (L)</td>
+                                    <td style="border:1px solid #ccc; padding:3px 6px; text-align:right;">
+                                        <t t-esc="'%.3f' % data['total_fuel_litres']"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border:1px solid #ccc; padding:3px 6px;">Total LPG (cyl)</td>
+                                    <td style="border:1px solid #ccc; padding:3px 6px; text-align:right;">
+                                        <t t-esc="'%.0f' % data['total_lpg_units']"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Signature line -->
+                    <div style="margin-top:30px; display:flex; gap:80px; font-size:9px;">
+                        <div>
+                            Supervisor: _________________________________ <br/>
+                            <t t-esc="shift.supervisor_id.name"/>
+                        </div>
+                        <div>
+                            Verified By: _________________________________
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Direct print from forecourt.shift form (no wizard) -->
+    <template id="report_forecourt_shift_direct_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="shift"        t-value="docs[0]"/>
+                <t t-set="company"      t-value="docs[0].company_id"/>
+                <t t-set="sales"        t-value="docs[0].sale_ids.filtered(lambda s: s.state == 'posted')"/>
+                <t t-set="fuel_entries" t-value="docs[0].fuel_entry_ids"/>
+                <t t-set="type_map" t-value="{'fuel': 'Fuel', 'lpg': 'LPG', 'lubricant': 'Lubricant'}"/>
+                <t t-set="pay_map"  t-value="{'cash': 'Cash', 'mobile_money': 'Mobile Money', 'card': 'Card / POS', 'credit': 'Fleet / Credit'}"/>
+
+                <div class="page">
+                    <div style="margin-bottom:6px; line-height:1.6;">
+                        <div><strong style="font-size:13px;" t-esc="company.name"/></div>
+                        <div t-esc="company.street or ''"/>
+                        <div>TPIN: <t t-esc="company.vat or ''"/></div>
+                    </div>
+                    <div style="margin-bottom:2px;"><strong style="font-size:13px;">Forecourt Shift Report</strong></div>
+                    <div style="margin-bottom:2px; font-style:italic;">
+                        Shift: <t t-esc="shift.name"/> â€”
+                        <t t-esc="shift.get_shift_type_label()"/>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        Supervisor: <t t-esc="shift.supervisor_id.name"/>
+                    </div>
+
+                    <!-- Fuel Entry Summary (for imported shifts) -->
+                    <t t-if="fuel_entries">
+                        <div style="margin-bottom:8px;"><strong>Fuel Inventory Summary</strong></div>
+                        <table style="width:100%; border-collapse:collapse; font-size:9px; margin-bottom:12px;">
+                            <thead>
+                                <tr style="background:#D9D9D9; font-weight:bold; text-align:center;">
+                                    <th style="border:1px solid #000; padding:3px;">Fuel</th>
+                                    <th style="border:1px solid #000; padding:3px;">Opening (L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Received (L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Total Sold (L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Credit (L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Cash Sales (L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Closing (L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Rate (K/L)</th>
+                                    <th style="border:1px solid #000; padding:3px;">Cash Value (K)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="fuel_entries" t-as="fe">
+                                    <tr>
+                                        <td style="border:1px solid #000; padding:2px; font-weight:bold;">
+                                            <t t-esc="'Petrol (ULP)' if fe.fuel_type == 'petrol' else 'Diesel (LSD)'"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.3f' % fe.opening_stock_litres"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.3f' % fe.received_stock_litres"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.3f' % fe.total_sold_litres"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.3f' % fe.credit_litres_sold"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.3f' % fe.cash_sales_litres"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.3f' % fe.closing_stock_litres"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;"><t t-esc="'%.4f' % fe.rate"/></td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right; font-weight:bold;"><t t-esc="'%.2f' % fe.cash_sales_value"/></td>
+                                    </tr>
+                                </t>
+                                <tr style="font-weight:bold; background:#F2F2F2;">
+                                    <td colspan="8" style="border:1px solid #000; padding:3px; text-align:center;">Total Cash Value</td>
+                                    <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                        <t t-esc="'%.2f' % sum(fuel_entries.mapped('cash_sales_value'))"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <!-- Sales table (for manually entered shifts) -->
+                    <t t-if="sales">
+                        <table style="width:100%; border-collapse:collapse; font-size:9px;">
+                            <thead>
+                                <tr style="background:#D9D9D9; font-weight:bold; text-align:center;">
+                                    <th style="border:1px solid #000; padding:3px; width:7%;">Time</th>
+                                    <th style="border:1px solid #000; padding:3px; width:8%;">Ref</th>
+                                    <th style="border:1px solid #000; padding:3px; width:8%;">Type</th>
+                                    <th style="border:1px solid #000; padding:3px; width:18%;">Product</th>
+                                    <th style="border:1px solid #000; padding:3px; width:9%;">Pump</th>
+                                    <th style="border:1px solid #000; padding:3px; width:10%;">Cashier</th>
+                                    <th style="border:1px solid #000; padding:3px; width:9%;">Payment</th>
+                                    <th style="border:1px solid #000; padding:3px; width:7%;">Qty</th>
+                                    <th style="border:1px solid #000; padding:3px; width:10%;">Unit Price</th>
+                                    <th style="border:1px solid #000; padding:3px; width:10%;">Total (ZMW)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="sales" t-as="s">
+                                    <tr>
+                                        <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                            <t t-esc="s.sale_datetime.strftime('%H:%M') if s.sale_datetime else ''"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px;" t-esc="s.name"/>
+                                        <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                            <t t-esc="type_map.get(s.product_type, s.product_type)"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px;">
+                                            <t t-esc="s.product_id.name if s.product_id else ''"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                            <t t-if="s.nozzle_id" t-esc="s.nozzle_id.name"/>
+                                            <t t-elif="s.pump_id" t-esc="s.pump_id.name"/>
+                                            <t t-else="">â€”</t>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px;">
+                                            <t t-esc="s.cashier_id.name if s.cashier_id else ''"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:center;">
+                                            <t t-esc="pay_map.get(s.payment_method, s.payment_method)"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                            <t t-esc="'%.3f' % s.quantity"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                            <t t-esc="'%.4f' % s.unit_price"/>
+                                        </td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right; font-weight:bold;">
+                                            <t t-esc="'%.4f' % s.total_amount"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tfoot>
+                                    <tr style="font-weight:bold; background:#F2F2F2;">
+                                        <td colspan="9" style="border:1px solid #000; padding:3px; text-align:center;">Grand Total</td>
+                                        <td style="border:1px solid #000; padding:2px; text-align:right;">
+                                            <t t-esc="'%.4f' % sum(sales.mapped('total_amount'))"/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <!-- Cash & POS Summary -->
+                    <div style="margin-top:16px; font-size:9px;">
+                        <table style="width:100%; border-collapse:collapse; margin-top:4px;">
+                            <thead>
+                                <tr style="background:#D9D9D9; font-weight:bold; text-align:center;">
+                                    <th colspan="8" style="border:1px solid #000; padding:4px; font-size:10px;">CASH &amp; POS SUMMARY</th>
+                                </tr>
+                                <tr style="background:#F2F2F2; font-weight:bold; text-align:center;">
+                                    <th style="border:1px solid #000; padding:3px; width:25%;">Fuel Cash (K)</th>
+                                    <th style="border:1px solid #000; padding:3px; width:25%;">POS / Card (K)</th>
+                                    <th style="border:1px solid #000; padding:3px; width:25%;">Lube Sales (K)</th>
+                                    <th style="border:1px solid #000; padding:3px; width:25%;">LPG Sales (K)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="text-align:center;">
+                                    <td style="border:1px solid #000; padding:4px; font-weight:bold;">
+                                        <t t-esc="'%.2f' % shift.cash_on_hand_kwacha"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:4px; font-weight:bold;">
+                                        <t t-esc="'%.2f' % shift.pos_account_kwacha"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:4px; font-weight:bold;">
+                                        <t t-esc="'%.2f' % shift.lube_sales_kwacha"/>
+                                    </td>
+                                    <td style="border:1px solid #000; padding:4px; font-weight:bold;">
+                                        <t t-esc="'%.2f' % shift.lpg_sales_kwacha"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="margin-top:30px; display:flex; gap:80px; font-size:9px;">
+                        <div>Supervisor: _________________________________<br/><t t-esc="shift.supervisor_id.name"/></div>
+                        <div>Verified By: _________________________________</div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

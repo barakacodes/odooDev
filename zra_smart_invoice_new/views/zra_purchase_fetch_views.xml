@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_zra_purchase_fetch_form" model="ir.ui.view">
+        <field name="name">zra.purchase.fetch.form</field>
+        <field name="model">zra.purchase.fetch</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Purchases from ZRA">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Retrieves purchases made by this business from other
+                        Smart Invoice-registered suppliers (checklist item #14
+                        — Get Purchases) and creates draft vendor bills from
+                        them, matched by supplier TPIN and ZRA item code.
+                    </div>
+                    <group>
+                        <field name="company_id"/>
+                        <field name="date_from"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_fetch" type="object" string="Fetch"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_zra_purchase_fetch" model="ir.actions.act_window">
+        <field name="name">Fetch Purchases</field>
+        <field name="res_model">zra.purchase.fetch</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ZRA Purchase Register (internal checklist — Reports: 'Purchases report
+         with tax amount details') — one row per vendor bill line so the
+         description of goods/services is meaningful. Exportable to Excel/CSV
+         via the native list view Export action. -->
+    <record id="view_zra_purchase_register_list" model="ir.ui.view">
+        <field name="name">zra.purchase.register.list</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <list string="ZRA Purchase Register" create="0" edit="0" delete="0">
+                <field name="move_id" string="Bill Number"/>
+                <field name="date" string="Bill Date"/>
+                <field name="partner_id" string="Supplier"/>
+                <field name="name" string="Description of Goods/Services"/>
+                <field name="quantity"/>
+                <field name="price_subtotal" string="Value (Excl. Tax)" sum="Total Excl. Tax"/>
+                <field name="zra_line_tax_amount" string="Tax Amount" sum="Total Tax"/>
+                <field name="price_total" string="Value (Incl. Tax)" sum="Total Incl. Tax"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_zra_purchase_register_search" model="ir.ui.view">
+        <field name="name">zra.purchase.register.search</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <search string="Search ZRA Purchase Register">
+                <field name="move_id"/>
+                <field name="partner_id"/>
+                <field name="name"/>
+                <filter string="Bills" name="bills" domain="[('move_id.move_type', '=', 'in_invoice')]"/>
+                <filter string="Refunds" name="refunds" domain="[('move_id.move_type', '=', 'in_refund')]"/>
+                <filter string="This Month" name="this_month"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Supplier" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Bill" name="group_move" context="{'group_by': 'move_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_zra_purchase_register" model="ir.actions.act_window">
+        <field name="name">ZRA Purchase Register</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[
+            ('move_id.move_type', 'in', ['in_invoice', 'in_refund']),
+            ('display_type', '=', 'product'),
+        ]</field>
+        <field name="context">{'search_default_this_month': 0}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No purchase lines yet.
+            </p>
+            <p>
+                Shows every line item from vendor bills and refunds — bill
+                number, date, supplier, description, value and tax amount.
+                Use the Export action (⚙ menu, top-right) for Excel/CSV output.
+            </p>
+        </field>
+    </record>
+
+</odoo>

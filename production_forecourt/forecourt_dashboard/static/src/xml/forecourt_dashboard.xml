@@ -1,0 +1,1000 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="forecourt_dashboard.Dashboard">
+<div class="o_action fc_dashboard" style="overflow-y: auto !important; height: 100%;">
+
+  <!-- ═══════════════ HERO HEADER ═══════════════ -->
+  <header class="fc_hero">
+    <div class="fc_brand">
+      <div class="fc_brand_logo">A</div>
+      <div class="fc_brand_text">
+        <div class="fc_brand_title">Forecourt Operations</div>
+        <div class="fc_brand_sub">Aziz Forecourt</div>
+      </div>
+    </div>
+    <div class="fc_hero_actions">
+      <div class="fc_live_badge">
+        <span class="fc_live_dot"/>
+        <span>LIVE · <t t-esc="state.lastRefresh"/></span>
+      </div>
+      <button class="fc_icon_btn" t-att-class="'fc_icon_btn' + (state.autoRefresh ? ' active' : '')" t-on-click="toggleAutoRefresh" title="Toggle Auto-Refresh (30s)">
+        <i class="fa fa-bolt"/>
+      </button>
+      <button class="fc_icon_btn" t-on-click="toggleDarkMode" t-att-title="state.darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <i t-attf-class="fa {{ state.darkMode ? 'fa-sun-o' : 'fa-moon-o' }}"/>
+      </button>
+      <button class="fc_icon_btn" t-on-click="()=>this.loadData(false)" title="Refresh Now">
+        <i class="fa fa-refresh"/>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════ FILTERS ═══════════════ -->
+  <div class="fc_filters">
+    <div class="fc_filter_group">
+      <span class="fc_filter_label">Branch</span>
+      <select class="fc_filter_input" t-on-change="onBranchChange">
+        <option value="all">All Stations</option>
+        <option value="arcades">Arcades</option>
+        <option value="luanshya">Luanshya</option>
+        <option value="chililabombwe">Chililabombwe</option>
+      </select>
+    </div>
+    <div class="fc_filter_group">
+      <span class="fc_filter_label">Period</span>
+      <select class="fc_filter_input" t-on-change="onPeriodChange">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly" selected="selected">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+    <div class="fc_filter_group">
+      <span class="fc_filter_label">From</span>
+      <input type="date" class="fc_filter_input" t-att-value="state.dateFrom" t-on-change="onDateFromChange"/>
+    </div>
+    <div class="fc_filter_group">
+      <span class="fc_filter_label">To</span>
+      <input type="date" class="fc_filter_input" t-att-value="state.dateTo" t-on-change="onDateToChange"/>
+    </div>
+  </div>
+
+  <t t-if="state.loading">
+    <div class="fc_loading">
+      <div class="fc_spinner"/>
+      <div>Loading operations data…</div>
+    </div>
+  </t>
+
+  <t t-else="">
+    <!-- ═══════════════ KPI GRID ═══════════════ -->
+    <div class="fc_kpi_grid">
+      <div class="fc_kpi fc_kpi--cash">
+        <div class="fc_kpi_head"><span class="fc_kpi_label">Cash Sales</span><span class="fc_kpi_icon"><i class="fa fa-money"/></span></div>
+        <div class="fc_kpi_value"><t t-esc="fmtK(state.data.cash_sales_total)"/></div>
+        <div class="fc_kpi_meta"><span class="fc_kpi_sub">Fuel + Lubes + LPG</span><div class="fc_kpi_spark"><canvas t-att-id="'sparkCash'"/></div></div>
+      </div>
+
+      <div class="fc_kpi fc_kpi--credit">
+        <div class="fc_kpi_head"><span class="fc_kpi_label">Credit Sales</span><span class="fc_kpi_icon"><i class="fa fa-credit-card"/></span></div>
+        <div class="fc_kpi_value"><t t-esc="fmtK(state.data.credit_sales_total)"/></div>
+        <div class="fc_kpi_meta"><span class="fc_kpi_sub">Fleet / Account holders</span><div class="fc_kpi_spark"><canvas t-att-id="'sparkCredit'"/></div></div>
+      </div>
+
+      <div class="fc_kpi fc_kpi--deposits">
+        <div class="fc_kpi_head"><span class="fc_kpi_label">Bank Deposits</span><span class="fc_kpi_icon"><i class="fa fa-university"/></span></div>
+        <div class="fc_kpi_value"><t t-esc="fmtK(state.data.total_deposits)"/></div>
+        <div class="fc_kpi_meta"><span class="fc_kpi_sub">Submitted reconciliations</span><div class="fc_kpi_spark"><canvas t-att-id="'sparkDeposits'"/></div></div>
+      </div>
+
+      <div class="fc_kpi fc_kpi--stockvar">
+        <div class="fc_kpi_head"><span class="fc_kpi_label">Stock Variance</span><span class="fc_kpi_icon"><i class="fa fa-flask"/></span></div>
+        <div t-attf-class="fc_kpi_value {{ state.data.total_variance &lt; 0 ? 'fc_kpi_value--neg' : 'fc_kpi_value--pos' }}">
+          <t t-esc="fmtL(state.data.total_variance)"/> <span style="font-size:0.9rem;font-weight:600;">L</span>
+        </div>
+        <div class="fc_kpi_meta"><span class="fc_kpi_sub">Expected vs Actual</span><div class="fc_kpi_spark"><canvas t-att-id="'sparkStockVar'"/></div></div>
+      </div>
+
+      <div class="fc_kpi fc_kpi--cashvar">
+        <div class="fc_kpi_head"><span class="fc_kpi_label">Cash Variance</span><span class="fc_kpi_icon"><i class="fa fa-balance-scale"/></span></div>
+        <div t-attf-class="fc_kpi_value {{ state.data.total_cash_variance &lt; 0 ? 'fc_kpi_value--neg' : 'fc_kpi_value--pos' }}">
+          <t t-esc="fmtK(state.data.total_cash_variance)"/>
+        </div>
+        <div class="fc_kpi_meta"><span class="fc_kpi_sub">Cash + POS vs Expected</span><div class="fc_kpi_spark"><canvas t-att-id="'sparkCashVar'"/></div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ TABS ═══════════════ -->
+    <div class="fc_tabs_wrap">
+      <nav class="fc_tabs_nav">
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='cash'?' active':'')" t-on-click="()=>this.setTab('cash')"><i class="fa fa-money"/> Cash Sales</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='credit'?' active':'')" t-on-click="()=>this.setTab('credit')"><i class="fa fa-credit-card"/> Credit Sales</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='inventory'?' active':'')" t-on-click="()=>this.setTab('inventory')"><i class="fa fa-cubes"/> Inventory</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='deposits'?' active':'')" t-on-click="()=>this.setTab('deposits')"><i class="fa fa-university"/> Deposits</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='variances'?' active':'')" t-on-click="()=>this.setTab('variances')"><i class="fa fa-balance-scale"/> Variances</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='tanks'?' active':'')" t-on-click="()=>this.setTab('tanks')"><i class="fa fa-tint"/> Tank Status</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='targets'?' active':'')" t-on-click="()=>this.setTab('targets')"><i class="fa fa-bullseye"/> Targets</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='profitability'?' active':'')" t-on-click="()=>this.setTab('profitability')"><i class="fa fa-line-chart"/> Profitability</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='losses'?' active':'')" t-on-click="()=>this.setTab('losses')"><i class="fa fa-exclamation-triangle"/> Losses &amp; Gains</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='fuel_detail'?' active':'')" t-on-click="()=>this.setTab('fuel_detail')"><i class="fa fa-flask"/> Fuel Detail</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='stock_val'?' active':'')" t-on-click="()=>this.setTab('stock_val')"><i class="fa fa-calculator"/> Valuation</button>
+        <button class="fc_tab" t-att-class="'fc_tab' + (state.activeTab==='trends'?' active':'')" t-on-click="()=>this.setTab('trends')"><i class="fa fa-area-chart"/> Trends</button>
+      </nav>
+
+      <!-- ─── CASH SALES ─── -->
+      <div t-if="state.activeTab==='cash'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-money"/> Cash Sales by Branch</div></div>
+        <div class="fc_chart_area"><canvas id="chartCash"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th><th class="text-end">Petrol (K)</th><th class="text-end">Diesel (K)</th>
+              <th class="text-end">Lubes (K)</th><th class="text-end">LPG (K)</th>
+              <th class="text-end">Total Cash (K)</th><th class="text-end">POS/Card (K)</th><th class="text-end">Gross (K)</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.cash_sales and state.data.cash_sales.length">
+                <t t-foreach="state.data.cash_sales" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.petrol_cash)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.diesel_cash)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.lubes)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.lpg)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtK(row.total_cash)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.pos)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtK(row.gross)"/></td>
+                  </tr>
+                </t>
+                <tr class="fc_table_totals">
+                  <td>TOTAL</td>
+                  <td class="text-end"><t t-esc="sumK(state.data.cash_sales,'petrol_cash')"/></td>
+                  <td class="text-end"><t t-esc="sumK(state.data.cash_sales,'diesel_cash')"/></td>
+                  <td class="text-end"><t t-esc="sumK(state.data.cash_sales,'lubes')"/></td>
+                  <td class="text-end"><t t-esc="sumK(state.data.cash_sales,'lpg')"/></td>
+                  <td class="text-end"><t t-esc="sumK(state.data.cash_sales,'total_cash')"/></td>
+                  <td class="text-end"><t t-esc="sumK(state.data.cash_sales,'pos')"/></td>
+                  <td class="text-end"><t t-esc="fmtK(state.data.cash_sales_total)"/></td>
+                </tr>
+              </t>
+              <t t-else="">
+                <tr><td colspan="8" class="fc_empty_state"><i class="fa fa-inbox"/>No cash sales for this period.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── CREDIT SALES ─── -->
+      <div t-if="state.activeTab==='credit'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-credit-card"/> Credit Sales by Branch</div></div>
+        <div class="fc_chart_area"><canvas id="chartCredit"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th><th class="text-end">Petrol (L)</th><th class="text-end">Petrol (K)</th>
+              <th class="text-end">Diesel (L)</th><th class="text-end">Diesel (K)</th><th class="text-end">Total (K)</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.credit_sales and state.data.credit_sales.length">
+                <t t-foreach="state.data.credit_sales" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.petrol_value)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.diesel_value)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtK(row.total)"/></td>
+                  </tr>
+                </t>
+              </t>
+              <t t-else="">
+                <tr><td colspan="6" class="fc_empty_state"><i class="fa fa-inbox"/>No credit sales for this period.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── INVENTORY ─── -->
+      <div t-if="state.activeTab==='inventory'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-cubes"/> Inventory Position</div></div>
+        <div class="fc_chart_area"><canvas id="chartInventory"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th><th>Fuel</th><th>As of</th>
+              <th class="text-end">Opening (L)</th><th class="text-end">Received (L)</th>
+              <th class="text-end">Sold Cash (L)</th><th class="text-end">Sold Credit (L)</th>
+              <th class="text-end">Total Sold (L)</th><th class="text-end">Closing (L)</th><th class="text-end">ATG (L)</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.inventory and state.data.inventory.length">
+                <t t-foreach="state.data.inventory" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td><t t-esc="row.product"/></td>
+                    <td style="color:var(--text-muted);font-size:0.78rem;"><t t-esc="row.date"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.opening)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.received)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.sold_cash)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.sold_credit)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtL(row.sold)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtL(row.closing)"/></td>
+                    <td class="text-end" style="color:var(--text-muted);"><t t-esc="fmtL(row.atg_closing)"/></td>
+                  </tr>
+                </t>
+              </t>
+              <t t-else="">
+                <tr><td colspan="10" class="fc_empty_state"><i class="fa fa-inbox"/>No inventory data available.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── DEPOSITS ─── -->
+      <div t-if="state.activeTab==='deposits'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-university"/> Bank Deposits</div></div>
+        <div class="fc_chart_area"><canvas id="chartDeposits"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th><th class="text-end">Day Shift (K)</th><th class="text-end">Night Shift (K)</th>
+              <th class="text-end">Lubes (K)</th><th class="text-end">LPG (K)</th><th class="text-end">Total (K)</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.deposits and state.data.deposits.length">
+                <t t-foreach="state.data.deposits" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.day_fuel)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.night_fuel)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.lubes)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.lpg)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtK(row.total)"/></td>
+                  </tr>
+                </t>
+              </t>
+              <t t-else="">
+                <tr><td colspan="6" class="fc_empty_state"><i class="fa fa-inbox"/>No deposit records for this period.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── VARIANCES — per branch, with report-consistency column ─── -->
+      <div t-if="state.activeTab==='variances'" class="fc_panel">
+        <div class="fc_panel_header">
+          <div class="fc_panel_title"><i class="fa fa-balance-scale"/> Variances by Fuel</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">
+          </div>
+        </div>
+        <div class="fc_chart_area"><canvas id="chartVariances"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table fc_var_split_table">
+            <thead>
+              <tr>
+                <th rowspan="2">Branch</th>
+                <th rowspan="2">Shift</th>
+                <th rowspan="2">Fuel</th>
+                <th class="text-end" colspan="2" style="border-left:2px solid var(--border-strong); text-align:center; color:var(--fc-navy);">LITRES</th>
+                <th class="text-end" rowspan="2" style="border-left:2px solid var(--border-strong);">Rate (K/L)</th>
+                <th class="text-end" rowspan="2">Value (K)</th>
+                <th class="text-center" rowspan="2" style="border-left:2px solid var(--border-strong);">Report</th>
+                <th class="text-center" rowspan="2">Status</th>
+              </tr>
+              <tr>
+                <th class="text-end" style="border-left:2px solid var(--border-strong);">Variance (L)</th>
+                <th class="text-end">Full Day (L)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-if="state.data.variances and state.data.variances.length">
+                <t t-foreach="state.data.variances" t-as="brow" t-key="brow_index">
+
+                  <t t-if="brow.has_data">
+
+                    <!-- ══ DAY ══ -->
+                    <tr class="fc_fd_diesel_row">
+                      <td rowspan="6" class="fw-semibold fc_var_split_branch"><t t-esc="brow.branch"/></td>
+                      <td rowspan="2">Day</td>
+                      <td class="fc_fd_fuel_badge fc_fd_badge_diesel">DIESEL</td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                          t-att-class="varColor(brow.day.diesel_var)">
+                        <t t-esc="fmtL(brow.day.diesel_var)"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_diesel_var)">
+                        <t t-esc="fmtL(brow.full_diesel_var)"/>
+                      </td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);">
+                        <t t-esc="brow.day.diesel_var ? fmtK(brow.day.diesel_rate) : '—'"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.day.diesel_var_k)">
+                        <t t-esc="fmtK(brow.day.diesel_var_k)"/>
+                      </td>
+                      <td class="text-center" rowspan="6" style="border-left:2px solid var(--border-strong);">
+                        <span t-if="brow.report_issue_count" class="fc_badge fc_badge--danger"
+                              t-att-title="'Entries with report diffs: ' + brow.report_issue_count + ' of ' + brow.total_entry_count">
+                          ⚠ <t t-esc="brow.report_issue_count"/>/<t t-esc="brow.total_entry_count"/>
+                        </span>
+                        <span t-else="" style="color:var(--text-muted);font-size:0.78rem;">—</span>
+                      </td>
+                      <td class="text-center" rowspan="2">
+                        <span t-attf-class="fc_badge fc_badge--{{ brow.day.status==='mismatch' ? 'danger' : (brow.day.status==='ok' ? 'success' : 'neutral') }}">
+                          <t t-esc="brow.day.status"/>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr class="fc_fd_petrol_row">
+                      <td class="fc_fd_fuel_badge fc_fd_badge_petrol">PETROL</td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                          t-att-class="varColor(brow.day.petrol_var)">
+                        <t t-esc="fmtL(brow.day.petrol_var)"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_petrol_var)">
+                        <t t-esc="fmtL(brow.full_petrol_var)"/>
+                      </td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);">
+                        <t t-esc="brow.day.petrol_var ? fmtK(brow.day.petrol_rate) : '—'"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.day.petrol_var_k)">
+                        <t t-esc="fmtK(brow.day.petrol_var_k)"/>
+                      </td>
+                    </tr>
+
+                    <!-- ══ NIGHT ══ -->
+                    <tr class="fc_fd_diesel_row">
+                      <td rowspan="2">Night</td>
+                      <td class="fc_fd_fuel_badge fc_fd_badge_diesel">DIESEL</td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                          t-att-class="varColor(brow.night.diesel_var)">
+                        <t t-esc="fmtL(brow.night.diesel_var)"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_diesel_var)">
+                        <t t-esc="fmtL(brow.full_diesel_var)"/>
+                      </td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);">
+                        <t t-esc="brow.night.diesel_var ? fmtK(brow.night.diesel_rate) : '—'"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.night.diesel_var_k)">
+                        <t t-esc="fmtK(brow.night.diesel_var_k)"/>
+                      </td>
+                      <td class="text-center" rowspan="2">
+                        <span t-attf-class="fc_badge fc_badge--{{ brow.night.status==='mismatch' ? 'danger' : (brow.night.status==='ok' ? 'success' : 'neutral') }}">
+                          <t t-esc="brow.night.status"/>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr class="fc_fd_petrol_row">
+                      <td class="fc_fd_fuel_badge fc_fd_badge_petrol">PETROL</td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                          t-att-class="varColor(brow.night.petrol_var)">
+                        <t t-esc="fmtL(brow.night.petrol_var)"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_petrol_var)">
+                        <t t-esc="fmtL(brow.full_petrol_var)"/>
+                      </td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);">
+                        <t t-esc="brow.night.petrol_var ? fmtK(brow.night.petrol_rate) : '—'"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.night.petrol_var_k)">
+                        <t t-esc="fmtK(brow.night.petrol_var_k)"/>
+                      </td>
+                    </tr>
+
+                    <!-- ══ FULL DAY ══ -->
+                    <tr class="fc_table_totals fc_fd_diesel_row">
+                      <td rowspan="2">Full Day</td>
+                      <td class="fc_fd_fuel_badge fc_fd_badge_diesel">DIESEL</td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                          t-att-class="varColor(brow.full_diesel_var)">
+                        <t t-esc="fmtL(brow.full_diesel_var)"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_diesel_var)">
+                        <t t-esc="fmtL(brow.full_diesel_var)"/>
+                      </td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);">
+                        <t t-esc="brow.full_diesel_var ? fmtK(brow.full_diesel_var_k / brow.full_diesel_var) : '—'"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_diesel_var_k)">
+                        <t t-esc="fmtK(brow.full_diesel_var_k)"/>
+                      </td>
+                      <td class="text-center" rowspan="2">
+                        <span t-attf-class="fc_badge fc_badge--{{ brow.status==='mismatch' ? 'danger' : (brow.status==='ok' ? 'success' : 'neutral') }}">
+                          <t t-esc="brow.status"/>
+                        </span>
+                      </td>
+                    </tr>
+                    <tr class="fc_table_totals fc_fd_petrol_row">
+                      <td class="fc_fd_fuel_badge fc_fd_badge_petrol">PETROL</td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                          t-att-class="varColor(brow.full_petrol_var)">
+                        <t t-esc="fmtL(brow.full_petrol_var)"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_petrol_var)">
+                        <t t-esc="fmtL(brow.full_petrol_var)"/>
+                      </td>
+                      <td class="text-end" style="border-left:2px solid var(--border-strong);">
+                        <t t-esc="brow.full_petrol_var ? fmtK(brow.full_petrol_var_k / brow.full_petrol_var) : '—'"/>
+                      </td>
+                      <td class="text-end" t-att-class="varColor(brow.full_petrol_var_k)">
+                        <t t-esc="fmtK(brow.full_petrol_var_k)"/>
+                      </td>
+                    </tr>
+                  </t>
+
+                  <t t-else="">
+                    <tr style="background:var(--bg-surface-2);">
+                      <td class="fw-semibold"
+                          style="color:var(--text-muted);border-right:2px solid var(--border-strong);">
+                        <t t-esc="brow.branch"/>
+                      </td>
+                      <td colspan="8"
+                          style="color:var(--text-muted);font-style:italic;padding:12px 20px;">
+                        <i class="fa fa-info-circle" title="No shifts recorded"/>
+                        &#160;No shifts recorded for this period.
+                      </td>
+                    </tr>
+                  </t>
+
+                </t>
+
+                <!-- ═══ GRAND TOTALS ═══ -->
+                <tr class="fc_table_totals" style="border-top:2px solid var(--border-strong);">
+                  <td colspan="3" class="fw-semibold">ALL BRANCHES</td>
+                  <td class="text-end" t-att-class="varColor(state.data.variance_by_branch_total_litres)">
+                    <t t-esc="fmtL(state.data.variance_by_branch_total_litres or 0)"/>
+                  </td>
+                  <td class="text-end">—</td>
+                  <td class="text-end">—</td>
+                  <td class="text-end" t-att-class="varColor(state.data.variance_by_branch_total_value_k)">
+                    <t t-esc="fmtK(state.data.variance_by_branch_total_value_k or 0)"/>
+                  </td>
+                  <td class="text-center">
+                    <span t-if="state.data.variance_report_issue_count" class="fc_badge fc_badge--danger">
+                      ⚠ <t t-esc="state.data.variance_report_issue_count"/>/<t t-esc="state.data.variance_total_entries"/>
+                    </span>
+                    <span t-else="" style="color:var(--text-muted);font-size:0.78rem;">—</span>
+                  </td>
+                  <td class="text-center">—</td>
+                </tr>
+
+              </t>
+              <t t-else="">
+                <tr><td colspan="9" class="fc_empty_state"><i class="fa fa-inbox"/>No variance data for this period.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── TARGETS ─── -->
+      <div t-if="state.activeTab==='targets'" class="fc_panel">
+        <div class="fc_panel_header">
+          <div class="fc_panel_title"><i class="fa fa-bullseye"/> Monthly Targets vs Actuals</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select class="fc_filter_input" style="min-width:110px;" t-on-change="onTargetMonthChange">
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="11">November</option><option value="12">December</option>
+            </select>
+            <input type="number" class="fc_filter_input" style="min-width:80px;" t-att-value="state.targetYear" t-on-change="onTargetYearChange"/>
+            <button class="fc_tab active" style="padding:7px 14px;" t-on-click="()=>this.loadData(false)">Apply</button>
+          </div>
+        </div>
+        <div class="fc_chart_area"><canvas id="chartTargets"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th>
+              <th class="text-end">Petrol Target</th><th class="text-end">Petrol Actual</th><th class="text-end">Petrol %</th>
+              <th class="text-end">Diesel Target</th><th class="text-end">Diesel Actual</th><th class="text-end">Diesel %</th>
+              <th class="text-end">Revenue Target</th><th class="text-end">Revenue Actual</th><th class="text-end">Revenue %</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.targets and state.data.targets.length">
+                <t t-foreach="state.data.targets" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol_target)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol_actual)"/></td>
+                    <td class="text-end">
+                      <div class="fc_progress_wrap">
+                        <div class="fc_progress_track"><div t-attf-class="fc_progress_bar fc_progress_bar--{{ pctBarClass(row.petrol_pct).split('_')[-1] }}" t-att-style="pctBarStyle(row.petrol_pct)"/></div>
+                        <span t-attf-class="fc_badge fc_badge--{{ pctBadgeClass(row.petrol_pct).split('-')[-1] }}"><t t-esc="fmtL(row.petrol_pct)"/>%</span>
+                      </div>
+                    </td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel_target)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel_actual)"/></td>
+                    <td class="text-end">
+                      <div class="fc_progress_wrap">
+                        <div class="fc_progress_track"><div t-attf-class="fc_progress_bar fc_progress_bar--{{ pctBarClass(row.diesel_pct).split('_')[-1] }}" t-att-style="pctBarStyle(row.diesel_pct)"/></div>
+                        <span t-attf-class="fc_badge fc_badge--{{ pctBadgeClass(row.diesel_pct).split('-')[-1] }}"><t t-esc="fmtL(row.diesel_pct)"/>%</span>
+                      </div>
+                    </td>
+                    <td class="text-end"><t t-esc="fmtK(row.revenue_target)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.revenue_actual)"/></td>
+                    <td class="text-end">
+                      <div class="fc_progress_wrap">
+                        <div class="fc_progress_track"><div t-attf-class="fc_progress_bar fc_progress_bar--{{ pctBarClass(row.revenue_pct).split('_')[-1] }}" t-att-style="pctBarStyle(row.revenue_pct)"/></div>
+                        <span t-attf-class="fc_badge fc_badge--{{ pctBadgeClass(row.revenue_pct).split('-')[-1] }}"><t t-esc="fmtL(row.revenue_pct)"/>%</span>
+                      </div>
+                    </td>
+                  </tr>
+                </t>
+              </t>
+              <t t-else="">
+                <tr><td colspan="10" class="fc_empty_state"><i class="fa fa-bullseye"/>No targets set. Go to Configuration → Monthly Targets.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── PROFITABILITY ─── -->
+      <div t-if="state.activeTab==='profitability'" class="fc_panel">
+        <div class="fc_panel_header">
+          <div class="fc_panel_title"><i class="fa fa-line-chart"/> Profitability Analysis</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">
+            Cost from deliveries, or from effective pump-rate cost price
+          </div>
+        </div>
+
+        <t t-if="state.data.profitability.has_cost_warning">
+          <div style="margin:16px 22px 0 22px;padding:14px 18px;background:rgba(217,119,6,0.12);border-left:4px solid var(--fc-warning);border-radius:8px;font-size:0.85rem;">
+            <strong style="color:var(--fc-warning);">
+              <i class="fa fa-exclamation-triangle"/> Cost data incomplete
+            </strong>
+            <div style="margin-top:6px;color:var(--text-primary);line-height:1.5;">
+              Some branches have revenue but no recorded fuel cost. Profit and margin are shown as <b>n/a</b> for those rows.
+              To get real margins:
+              <ul style="margin:6px 0 0 18px;padding:0;">
+                <li>Record deliveries under <b>Forecourt → Inventory → Deliveries</b>, or</li>
+                <li>Fill in <b>Petrol Cost Price</b> and <b>Diesel Cost Price</b> on <b>Forecourt → Configuration → Pump Rates</b>.</li>
+              </ul>
+            </div>
+          </div>
+        </t>
+
+        <div class="fc_chart_area"><canvas id="chartProfitability"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th>
+              <th class="text-end">Revenue (K)</th>
+              <th class="text-end">Fuel Cost (K)</th>
+              <th class="text-end">Gross Profit (K)</th>
+              <th class="text-end">Margin %</th>
+              <th class="text-center">Cost Source</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.profitability.rows and state.data.profitability.rows.length">
+                <t t-foreach="state.data.profitability.rows" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.revenue)"/></td>
+                    <td class="text-end" style="color:var(--fc-danger);">
+                      <t t-if="row.has_cost">
+                        <t t-esc="fmtK(row.cost)"/>
+                      </t>
+                      <t t-else="">—</t>
+                    </td>
+                    <td class="text-end fw-semibold">
+                      <t t-if="row.has_cost">
+                        <span t-attf-style="color: {{ row.gross_profit &gt;= 0 ? 'var(--fc-success)' : 'var(--fc-danger)' }};">
+                          <t t-esc="fmtK(row.gross_profit)"/>
+                        </span>
+                      </t>
+                      <t t-else="">
+                        <span style="color:var(--text-muted);">n/a</span>
+                      </t>
+                    </td>
+                    <td class="text-end">
+                      <t t-if="row.has_cost">
+                        <div class="fc_progress_wrap">
+                          <div class="fc_progress_track">
+                            <div t-attf-class="fc_progress_bar fc_progress_bar--{{ pctBarClass(row.margin).split('_')[-1] }}"
+                                 t-att-style="pctBarStyle(row.margin)"/>
+                          </div>
+                          <span t-attf-class="fc_badge fc_badge--{{ pctBadgeClass(row.margin).split('-')[-1] }}">
+                            <t t-esc="fmtL(row.margin)"/>%
+                          </span>
+                        </div>
+                      </t>
+                      <t t-else="">
+                        <span class="fc_badge fc_badge--neutral">n/a</span>
+                      </t>
+                    </td>
+                    <td class="text-center">
+                      <t t-if="row.cost_source == 'delivery'">
+                        <span class="fc_badge fc_badge--success" title="Cost derived from recorded deliveries">Delivery</span>
+                      </t>
+                      <t t-elif="row.cost_source == 'rate'">
+                        <span class="fc_badge fc_badge--neutral" title="Cost derived from effective pump rate">Rate</span>
+                      </t>
+                      <t t-else="">
+                        <span class="fc_badge fc_badge--warning" title="No cost basis available">Missing</span>
+                      </t>
+                    </td>
+                  </tr>
+                </t>
+                <tr class="fc_table_totals">
+                  <td>TOTAL</td>
+                  <td class="text-end"><t t-esc="fmtK(state.data.profitability.grand_revenue)"/></td>
+                  <td class="text-end">
+                    <t t-if="state.data.profitability.grand_has_cost">
+                      <t t-esc="fmtK(state.data.profitability.grand_cost)"/>
+                    </t>
+                    <t t-else="">—</t>
+                  </td>
+                  <td class="text-end">
+                    <t t-if="state.data.profitability.grand_has_cost">
+                      <t t-esc="fmtK(state.data.profitability.grand_profit)"/>
+                    </t>
+                    <t t-else="">n/a</t>
+                  </td>
+                  <td class="text-end">
+                    <t t-if="state.data.profitability.grand_has_cost">
+                      <t t-esc="fmtL(state.data.profitability.grand_margin)"/>%
+                    </t>
+                    <t t-else="">n/a</t>
+                  </td>
+                  <td class="text-center">—</td>
+                </tr>
+              </t>
+              <t t-else="">
+                <tr><td colspan="6" class="fc_empty_state"><i class="fa fa-inbox"/>No profitability data for this period.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── LOSSES & GAINS — one row per fuel ─── -->
+      <div t-if="state.activeTab==='losses'" class="fc_panel">
+        <div class="fc_panel_header">
+          <div class="fc_panel_title"><i class="fa fa-exclamation-triangle"/> Losses &amp; Gains</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">
+            Diesel row on top, Petrol row below — per branch
+          </div>
+        </div>
+        <div class="fc_chart_area"><canvas id="chartLosses"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table fc_var_split_table">
+            <thead>
+              <tr>
+                <th>Branch</th>
+                <th>Fuel</th>
+                <th class="text-end">Variance (L)</th>
+                <th class="text-end">Rate (K/L)</th>
+                <th class="text-end">Value (K)</th>
+                <th class="text-end" style="border-left:2px solid var(--border-strong);">Cash Var (K)</th>
+                <th class="text-end">Net (K)</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-if="state.data.losses.rows and state.data.losses.rows.length">
+                <t t-foreach="state.data.losses.rows" t-as="row" t-key="row_index">
+
+                  <tr class="fc_fd_diesel_row">
+                    <td rowspan="2" class="fw-semibold fc_var_split_branch"><t t-esc="row.branch"/></td>
+                    <td class="fc_fd_fuel_badge fc_fd_badge_diesel">DIESEL</td>
+                    <td class="text-end" t-att-class="varColor(row.diesel_var_l)">
+                      <t t-esc="fmtL(row.diesel_var_l)"/>
+                    </td>
+                    <td class="text-end">—</td>
+                    <td class="text-end" t-att-class="varColor(row.diesel_var_k)">
+                      <t t-esc="fmtK(row.diesel_var_k)"/>
+                    </td>
+                    <td class="text-end" style="border-left:2px solid var(--border-strong);">—</td>
+                    <td class="text-end" t-att-class="varColor(row.diesel_var_k)">
+                      <t t-esc="fmtK(row.diesel_var_k)"/>
+                    </td>
+                    <td class="text-center" rowspan="2">
+                      <span t-attf-class="fc_badge fc_badge--{{ row.status==='loss' ? 'danger' : (row.status==='gain' ? 'success' : 'neutral') }}">
+                        <t t-esc="row.status"/>
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr class="fc_fd_petrol_row">
+                    <td class="fc_fd_fuel_badge fc_fd_badge_petrol">PETROL</td>
+                    <td class="text-end" t-att-class="varColor(row.petrol_var_l)">
+                      <t t-esc="fmtL(row.petrol_var_l)"/>
+                    </td>
+                    <td class="text-end">—</td>
+                    <td class="text-end" t-att-class="varColor(row.petrol_var_k)">
+                      <t t-esc="fmtK(row.petrol_var_k)"/>
+                    </td>
+                    <td class="text-end" style="border-left:2px solid var(--border-strong);">—</td>
+                    <td class="text-end" t-att-class="varColor(row.petrol_var_k)">
+                      <t t-esc="fmtK(row.petrol_var_k)"/>
+                    </td>
+                  </tr>
+
+                  <tr class="fc_table_totals fc_var_branch_total_row">
+                    <td colspan="5" class="text-end">Branch Cash &amp; Net:</td>
+                    <td class="text-end" style="border-left:2px solid var(--border-strong);"
+                        t-att-class="varColor(row.cash_var)">
+                      <t t-esc="fmtK(row.cash_var)"/>
+                    </td>
+                    <td class="text-end fw-semibold"
+                        t-attf-style="color: {{ row.net &lt; 0 ? 'var(--fc-danger)' : 'var(--fc-success)' }};">
+                      <t t-esc="fmtK(row.net)"/>
+                    </td>
+                    <td/>
+                  </tr>
+
+                </t>
+              </t>
+              <t t-else="">
+                <tr><td colspan="8" class="fc_empty_state"><i class="fa fa-inbox"/>No variance data for this period.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── FUEL DETAIL — three rows per shift: Diesel, Petrol, Shift Totals ─── -->
+      <div t-if="state.activeTab==='fuel_detail'" class="fc_panel">
+        <div class="fc_panel_header">
+          <div class="fc_panel_title"><i class="fa fa-flask"/> Fuel Detail — Shift by Shift</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">
+            Diesel · Petrol · Shift Totals — one shift per block
+          </div>
+        </div>
+
+        <!-- Bounded-height scroll region — makes both the sticky header
+             and the sticky identity columns actually stick. -->
+        <div class="fc_fuel_detail_scroll">
+          <table class="fc_table fc_fuel_detail_table">
+            <thead>
+              <tr>
+                <th class="fc_fd_col_date fc_fd_sticky_h fc_fd_sticky_1">Date</th>
+                <th class="fc_fd_col_shift fc_fd_sticky_h fc_fd_sticky_2">Shift</th>
+                <th class="fc_fd_col_branch fc_fd_sticky_h fc_fd_sticky_3">Branch</th>
+                <th class="fc_fd_col_supervisor fc_fd_sticky_h fc_fd_sticky_4">Supervisor</th>
+                <th class="fc_fd_col_fuel fc_fd_sticky_h fc_fd_sticky_5">Fuel</th>
+                <th class="text-end fc_fd_col_num">Opening (L)</th>
+                <th class="text-end fc_fd_col_num">Received (L)</th>
+                <th class="text-end fc_fd_col_num">Sold (L)</th>
+                <th class="text-end fc_fd_col_num">Report Diff (L)</th>
+                <th class="text-end fc_fd_col_num">Credit (L)</th>
+                <th class="text-end fc_fd_col_num">Cash (L)</th>
+                <th class="text-end fc_fd_col_num">Expected Close (L)</th>
+                <th class="text-end fc_fd_col_num">Actual Close (L)</th>
+                <th class="text-end fc_fd_col_num">Variance (L)</th>
+                <th class="text-end fc_fd_col_num">Rate (K/L)</th>
+                <th class="text-end fc_fd_col_kwacha">Cash Value (K)</th>
+                <th class="text-end fc_fd_col_kwacha">Variance (K)</th>
+                <th class="text-end fc_fd_col_shift_lvl">POS (K)</th>
+                <th class="text-end fc_fd_col_shift_lvl">Lubes (K)</th>
+                <th class="text-end fc_fd_col_shift_lvl">LPG (K)</th>
+                <th class="text-end fc_fd_col_wide">Expected Cash @ Hand (K)</th>
+                <th class="text-end fc_fd_col_shift_lvl">Cash @ Hand (K)</th>
+                <th class="text-end fc_fd_col_shift_lvl">Cash Variance (K)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <t t-if="state.data.fuel_detail and state.data.fuel_detail.rows and state.data.fuel_detail.rows.length">
+                <t t-foreach="state.data.fuel_detail.rows" t-as="row" t-key="row.shift_id">
+
+                  <tr class="fc_fd_diesel_row">
+                    <td rowspan="3" class="fc_fd_cell_date fc_fd_sticky_c fc_fd_sticky_1"><t t-esc="row.date"/></td>
+                    <td rowspan="3" class="fc_fd_cell_shift fc_fd_sticky_c fc_fd_sticky_2">
+                      <span t-attf-class="fc_badge fc_badge--{{ row.shift_type == 'day' ? 'neutral' : 'warning' }}"><t t-esc="row.shift_type_label"/></span>
+                    </td>
+                    <td rowspan="3" class="fc_fd_cell_branch fw-semibold fc_fd_sticky_c fc_fd_sticky_3"><t t-esc="row.branch"/></td>
+                    <td rowspan="3" class="fc_fd_cell_supervisor fc_fd_sticky_c fc_fd_sticky_4"><t t-esc="row.supervisor"/></td>
+
+                    <td class="fc_fd_fuel_badge fc_fd_badge_diesel fc_fd_sticky_c fc_fd_sticky_5">DIESEL</td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.opening_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.received_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.sold_litres)"/></td>
+                    <td class="text-end" t-att-class="varColor(row.diesel.report_consistency_variance)">
+                      <t t-if="row.diesel.report_consistency_status == 'mismatch'">
+                        ⚠ <t t-esc="fmtL(row.diesel.report_consistency_variance)"/>
+                      </t>
+                      <t t-else="">—</t>
+                    </td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.credit_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.cash_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.expected_closing_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.diesel.actual_closing_litres)"/></td>
+                    <td class="text-end" t-att-class="varColor(row.diesel.variance_litres)"><t t-esc="fmtL(row.diesel.variance_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.diesel.rate_used)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.diesel.cash_value_k)"/></td>
+                    <td class="text-end" t-att-class="varColor(row.diesel.variance_value_k)"><t t-esc="fmtK(row.diesel.variance_value_k)"/></td>
+                    <td/><td/><td/><td/><td/><td/>
+                  </tr>
+
+                  <tr class="fc_fd_petrol_row">
+                    <td class="fc_fd_fuel_badge fc_fd_badge_petrol fc_fd_sticky_c fc_fd_sticky_5">PETROL</td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.opening_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.received_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.sold_litres)"/></td>
+                    <td class="text-end" t-att-class="varColor(row.petrol.report_consistency_variance)">
+                      <t t-if="row.petrol.report_consistency_status == 'mismatch'">
+                        ⚠ <t t-esc="fmtL(row.petrol.report_consistency_variance)"/>
+                      </t>
+                      <t t-else="">—</t>
+                    </td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.credit_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.cash_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.expected_closing_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.petrol.actual_closing_litres)"/></td>
+                    <td class="text-end" t-att-class="varColor(row.petrol.variance_litres)"><t t-esc="fmtL(row.petrol.variance_litres)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.petrol.rate_used)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.petrol.cash_value_k)"/></td>
+                    <td class="text-end" t-att-class="varColor(row.petrol.variance_value_k)"><t t-esc="fmtK(row.petrol.variance_value_k)"/></td>
+                    <td/><td/><td/><td/><td/><td/>
+                  </tr>
+
+                  <tr class="fc_fd_shift_row">
+                    <td class="fc_fd_shift_label fc_fd_sticky_c fc_fd_sticky_5">TOTALS</td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.opening_litres + row.diesel.opening_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.received_litres + row.diesel.received_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.sold_litres + row.diesel.sold_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total" t-att-class="varColor(row.petrol.report_consistency_variance + row.diesel.report_consistency_variance)">
+                      <t t-if="row.has_report_issue">
+                        ⚠ <t t-esc="fmtL(row.petrol.report_consistency_variance + row.diesel.report_consistency_variance)"/>
+                      </t>
+                      <t t-else="">—</t>
+                    </td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.credit_litres + row.diesel.credit_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.cash_litres + row.diesel.cash_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.expected_closing_litres + row.diesel.expected_closing_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtL(row.petrol.actual_closing_litres + row.diesel.actual_closing_litres)"/></td>
+                    <td class="text-end fc_fd_shift_total" t-att-class="varColor(row.petrol.variance_litres + row.diesel.variance_litres)">
+                      <t t-esc="fmtL(row.petrol.variance_litres + row.diesel.variance_litres)"/>
+                    </td>
+                    <td class="text-end fc_fd_shift_total">—</td>
+                    <td class="text-end fc_fd_shift_total"><t t-esc="fmtK(row.petrol.cash_value_k + row.diesel.cash_value_k)"/></td>
+                    <td class="text-end fc_fd_shift_total" t-att-class="varColor(row.petrol.variance_value_k + row.diesel.variance_value_k)">
+                      <t t-esc="fmtK(row.petrol.variance_value_k + row.diesel.variance_value_k)"/>
+                    </td>
+                    <td class="text-end fc_fd_shift_level"><t t-esc="fmtK(row.pos_k)"/></td>
+                    <td class="text-end fc_fd_shift_level"><t t-esc="fmtK(row.lubes_k)"/></td>
+                    <td class="text-end fc_fd_shift_level"><t t-esc="fmtK(row.lpg_k)"/></td>
+                    <td class="text-end fc_fd_shift_level"><t t-esc="fmtK(row.expected_cash_at_hand_k)"/></td>
+                    <td class="text-end fc_fd_shift_level"><t t-esc="fmtK(row.cash_on_hand_k)"/></td>
+                    <td class="text-end fc_fd_shift_level" t-att-class="varColor(row.cash_check_variance_k)"><t t-esc="fmtK(row.cash_check_variance_k)"/></td>
+                  </tr>
+
+                </t>
+              </t>
+              <t t-else="">
+                <tr>
+                  <td colspan="23" class="fc_empty_state"><i class="fa fa-inbox"/>No shifts found for this period.</td>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── STOCK VALUATION ─── -->
+      <div t-if="state.activeTab==='stock_val'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-calculator"/> Stock Valuation</div></div>
+        <div class="fc_chart_area"><canvas id="chartStockVal"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Branch</th><th>Product</th><th>As of</th>
+              <th class="text-end">Stock on Hand (L)</th><th class="text-end">Cost Price (K/L)</th>
+              <th class="text-end">Cost Value (K)</th><th class="text-end">Pump Price (K/L)</th><th class="text-end">Pump Value (K)</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.stock_val.rows and state.data.stock_val.rows.length">
+                <t t-foreach="state.data.stock_val.rows" t-as="row" t-key="row_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="row.branch"/></td>
+                    <td><t t-esc="row.product"/></td>
+                    <td style="color:var(--text-muted);font-size:0.78rem;"><t t-esc="row.as_of"/></td>
+                    <td class="text-end"><t t-esc="fmtL(row.qty)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.cost_price)"/></td>
+                    <td class="text-end fw-semibold"><t t-esc="fmtK(row.cost_value)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.pump_price)"/></td>
+                    <td class="text-end"><t t-esc="fmtK(row.pump_value)"/></td>
+                  </tr>
+                </t>
+                <tr class="fc_table_totals">
+                  <td colspan="5">TOTAL STOCK VALUE</td>
+                  <td class="text-end"><t t-esc="fmtK(state.data.stock_val.total_cost_value)"/></td>
+                  <td/>
+                  <td class="text-end"><t t-esc="fmtK(state.data.stock_val.total_pump_value)"/></td>
+                </tr>
+              </t>
+              <t t-else="">
+                <tr><td colspan="8" class="fc_empty_state"><i class="fa fa-inbox"/>No stock data. Import shifts first.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── TRENDS ─── -->
+      <div t-if="state.activeTab==='trends'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-area-chart"/> 6-Month Performance Trends</div></div>
+        <div class="fc_chart_area" style="height:380px;"><canvas id="chartTrends"/></div>
+        <div class="fc_table_wrap">
+          <table class="fc_table">
+            <thead><tr>
+              <th>Month</th>
+              <th class="text-end">Cash Sales (K)</th>
+              <th class="text-end">Cash Variance (K)</th>
+              <th class="text-end">Stock Variance (K)</th>
+            </tr></thead>
+            <tbody>
+              <t t-if="state.data.trends and state.data.trends.labels and state.data.trends.labels.length">
+                <t t-foreach="state.data.trends.labels" t-as="label" t-key="label_index">
+                  <tr>
+                    <td class="fw-semibold"><t t-esc="label"/></td>
+                    <td class="text-end"><t t-esc="fmtK(state.data.trends.cash[label_index])"/></td>
+                    <td class="text-end" t-attf-style="color: {{ state.data.trends.variance[label_index] &lt; 0 ? 'var(--fc-danger)' : 'var(--fc-success)' }};"><t t-esc="fmtK(state.data.trends.variance[label_index])"/></td>
+                    <td class="text-end" t-attf-style="color: {{ state.data.trends.stock_var[label_index] &lt; 0 ? 'var(--fc-danger)' : 'var(--fc-success)' }};"><t t-esc="fmtK(state.data.trends.stock_var[label_index])"/></td>
+                  </tr>
+                </t>
+              </t>
+              <t t-else="">
+                <tr><td colspan="4" class="fc_empty_state"><i class="fa fa-inbox"/>No trend data available yet.</td></tr>
+              </t>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── TANK STATUS ─── -->
+      <div t-if="state.activeTab==='tanks'" class="fc_panel">
+        <div class="fc_panel_header"><div class="fc_panel_title"><i class="fa fa-tint"/> Tank Status by Branch</div></div>
+        <div class="fc_chart_area"><canvas id="chartBranchStock"/></div>
+        <div class="fc_table_wrap">
+          <t t-if="state.data.branch_stock and state.data.branch_stock.length">
+            <t t-foreach="state.data.branch_stock" t-as="bs" t-key="bs_index">
+              <div style="margin-bottom:22px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                  <h5 style="margin:0;color:var(--fc-navy);font-weight:700;font-size:1.05rem;"><t t-esc="bs.branch"/></h5>
+                  <div style="display:flex;gap:12px;align-items:center;">
+                    <span style="color:var(--text-muted);font-size:0.75rem;"><t t-esc="bs.tank_count"/> tank(s)</span>
+                    <span style="font-weight:700;color:var(--text-primary);"><t t-esc="fmtL(bs.total_current)"/> L / <t t-esc="fmtL(bs.total_capacity)"/> L</span>
+                    <span t-attf-class="fc_badge fc_badge--{{ pctBadgeClass(bs.total_pct).split('-')[-1] }}"><t t-esc="fmtL(bs.total_pct)"/>%</span>
+                  </div>
+                </div>
+                <t t-if="bs.tanks and bs.tanks.length">
+                  <div class="fc_tank_grid">
+                    <t t-foreach="bs.tanks" t-as="tank" t-key="tank_index">
+                      <div t-attf-class="fc_tank fc_tank--{{ tank.status or 'ok' }}">
+                        <div class="fc_tank_donut">
+                          <canvas t-att-id="'chartTank'+bs_index+'_'+tank_index" width="120" height="120"/>
+                          <div class="fc_tank_pct"><t t-esc="fmtL(tank.pct)"/>%</div>
+                        </div>
+                        <div class="fc_tank_name"><t t-esc="tank.name"/></div>
+                        <div class="fc_tank_product"><t t-esc="tank.product"/></div>
+                        <div class="fc_tank_levels"><t t-esc="fmtL(tank.current)"/> L / <t t-esc="fmtL(tank.capacity)"/> L</div>
+                      </div>
+                    </t>
+                  </div>
+                </t>
+                <t t-else="">
+                  <div class="fc_empty_state" style="padding:24px;"><i class="fa fa-tint"/>No active tanks at this branch.</div>
+                </t>
+              </div>
+            </t>
+          </t>
+          <t t-else="">
+            <div class="fc_empty_state"><i class="fa fa-tint"/>No branches flagged as forecourt branches yet.</div>
+          </t>
+        </div>
+      </div>
+
+    </div>
+  </t>
+</div>
+</t>
+</templates>

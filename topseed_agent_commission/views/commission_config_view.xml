@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commission_config_form" model="ir.ui.view">
+        <field name="name">topseed.commission.config.form</field>
+        <field name="model">topseed.commission.config</field>
+        <field name="arch" type="xml">
+            <form string="Commission Configuration">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="commission_product_id"/>
+                            <field name="commission_account_id"/>
+                            <field name="commission_journal_id"/>
+                        </group>
+                    </group>
+                    <group string="Default Settings">
+                        <group>
+                            <field name="default_rate"/>
+                            <field name="calculation_method"/>
+                            <field name="calculation_basis"/>
+                        </group>
+                        <group>
+                            <field name="commission_due_days"/>
+                            <field name="auto_approve_commission"/>
+                            <field name="commission_threshold"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_commission_config_tree" model="ir.ui.view">
+        <field name="name">topseed.commission.config.tree</field>
+        <field name="model">topseed.commission.config</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Configurations">
+                <field name="name"/>
+                <field name="default_rate"/>
+                <field name="calculation_method"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="action_commission_config" model="ir.actions.act_window">
+        <field name="name">Commission Configuration</field>
+        <field name="res_model">topseed.commission.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help">Configure global commission settings.</field>
+    </record>
+</odoo>

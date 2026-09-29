@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Report action (PDF) -->
+        <record id="action_forecourt_daily_report_pdf" model="ir.actions.report">
+            <field name="name">Daily Sales Report</field>
+            <field name="model">forecourt.daily.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">forecourt_operations.report_forecourt_daily_document</field>
+            <field name="report_file">forecourt_operations.report_forecourt_daily_document</field>
+            <field name="print_report_name">'Daily_Sales_Report_%s' % (object.report_date)</field>
+        </record>
+
+        <!-- Wizard form view -->
+        <record id="view_forecourt_daily_report_wizard_form" model="ir.ui.view">
+            <field name="name">forecourt.daily.report.wizard.form</field>
+            <field name="model">forecourt.daily.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Daily Sales Report">
+                    <sheet>
+                        <div class="oe_title">
+                            <h2>Daily Sales Report</h2>
+                        </div>
+                        <group>
+                            <group string="Filters">
+                                <field name="report_date"/>
+                                <field name="branch"/>
+                                <field name="shift_type"/>
+                                <field name="section"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_print_pdf"
+                                string="Print PDF"
+                                type="object"
+                                class="btn-primary"/>
+                        <button name="action_export_excel"
+                                string="Export Excel"
+                                type="object"
+                                class="btn-secondary"/>
+                        <button special="cancel" string="Close"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action to open wizard -->
+        <record id="action_forecourt_daily_report_wizard" model="ir.actions.act_window">
+            <field name="name">Daily Sales Report</field>
+            <field name="res_model">forecourt.daily.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Menu item under Forecourt > Reports -->
+        <menuitem id="menu_forecourt_daily_report"
+                  name="Daily Sales Report"
+                  parent="forecourt_operations.menu_forecourt_reports"
+                  action="action_forecourt_daily_report_wizard"
+                  sequence="5"/>
+    </data>
+</odoo>

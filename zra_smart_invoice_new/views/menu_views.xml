@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_zra_root"
+              name="ZRA Smart Invoice"
+              sequence="50"
+              web_icon="zra_smart_invoice,static/description/icon.png"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_zra_configuration"
+              name="Configuration"
+              parent="menu_zra_root"
+              sequence="10"/>
+
+    <menuitem id="menu_zra_config"
+              name="ZRA Settings"
+              parent="menu_zra_configuration"
+              action="action_zra_config"
+              sequence="10"/>
+
+    <!-- Monitoring -->
+    <menuitem id="menu_zra_monitoring"
+              name="Monitoring"
+              parent="menu_zra_root"
+              sequence="20"/>
+
+    <menuitem id="menu_zra_logs"
+              name="API Logs"
+              parent="menu_zra_monitoring"
+              action="action_zra_api_log"
+              sequence="10"/>
+
+    <menuitem id="menu_zra_invoices"
+              name="Synced Invoices"
+              parent="menu_zra_monitoring"
+              action="account.action_move_out_invoice_type"
+              sequence="20"/>
+
+    <!-- checklist #30, #31: Sales Register report -->
+    <menuitem id="menu_zra_sales_register"
+              name="Sales Register"
+              parent="menu_zra_monitoring"
+              action="action_zra_sales_register"
+              sequence="30"/>
+
+    <menuitem id="menu_zra_purchase_register"
+              name="Purchase Register"
+              parent="menu_zra_monitoring"
+              action="action_zra_purchase_register"
+              sequence="31"/>
+
+    <menuitem id="menu_zra_backup_log"
+              name="Backup Runs"
+              parent="menu_zra_monitoring"
+              action="action_zra_backup_log"
+              sequence="40"/>
+
+    <!-- Reference Data (checklist #2, #3) -->
+    <menuitem id="menu_zra_reference_data"
+              name="Reference Data"
+              parent="menu_zra_configuration"
+              sequence="20"/>
+
+    <menuitem id="menu_zra_classification_codes"
+              name="Classification Codes"
+              parent="menu_zra_reference_data"
+              action="action_zra_classification_code"
+              sequence="10"/>
+
+    <menuitem id="menu_zra_standard_codes"
+              name="Standard Codes"
+              parent="menu_zra_reference_data"
+              action="action_zra_standard_code"
+              sequence="20"/>
+
+    <!-- Stock -->
+    <menuitem id="menu_zra_stock"
+              name="Stock"
+              parent="menu_zra_root"
+              sequence="30"/>
+
+    <menuitem id="menu_zra_stock_adjustment"
+              name="Stock Adjustment (ZRA)"
+              parent="menu_zra_stock"
+              action="action_zra_stock_adjustment"
+              sequence="10"/>
+
+    <!-- PARITY #2: Import Declarations -->
+    <menuitem id="menu_zra_imports"
+              name="Imports"
+              parent="menu_zra_root"
+              sequence="40"/>
+
+    <menuitem id="menu_zra_import_declarations"
+              name="Import Declarations"
+              parent="menu_zra_imports"
+              action="action_zra_import_declaration"
+              sequence="10"/>
+
+    <menuitem id="menu_zra_fetch_declarations"
+              name="Fetch Declarations from ZRA"
+              parent="menu_zra_imports"
+              action="action_zra_import_declaration_fetch"
+              sequence="20"/>
+
+    <!-- Purchases -->
+    <menuitem id="menu_zra_purchases"
+              name="Purchases"
+              parent="menu_zra_root"
+              sequence="35"/>
+
+    <menuitem id="menu_zra_fetch_purchases"
+              name="Fetch Purchases from ZRA"
+              parent="menu_zra_purchases"
+              action="action_zra_purchase_fetch"
+              sequence="10"/>
+
+    <menuitem id="menu_zra_vendor_bills"
+              name="Vendor Bills"
+              parent="menu_zra_purchases"
+              action="account.action_move_in_invoice_type"
+              sequence="20"/>
+
+</odoo>

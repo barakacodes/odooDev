@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_forecourt_cash_recon_form" model="ir.ui.view">
+        <field name="name">forecourt.cash.reconciliation.form</field>
+        <field name="model">forecourt.cash.reconciliation</field>
+        <field name="arch" type="xml">
+            <form string="Cash Reconciliation">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success"
+                            invisible="state != 'submitted'"
+                            groups="forecourt_operations.group_forecourt_supervisor"/>
+                    <button name="action_create_journal_entry"
+                            string="Create Journal Entry" type="object"
+                            class="btn-secondary"
+                            invisible="state != 'approved' or move_id"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"
+                            groups="forecourt_operations.group_forecourt_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Shift Details">
+                            <field name="recon_date"/>
+                            <field name="shift_id"/>
+                            <field name="prepared_by"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Summary">
+                            <field name="total_cash_collected"/>
+                            <field name="total_expected"/>
+                            <field name="variance"
+                                   decoration-danger="variance &lt; 0"
+                                   decoration-success="variance &gt;= 0"
+                                   widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Fuel Sales">
+                            <group>
+                                <group string="Sales by Payment Method">
+                                    <field name="fuel_cash"/>
+                                    <field name="pos_amount"/>
+                                    <field name="mobile_money_amount"/>
+                                    <field name="fuel_cash_at_hand"/>
+                                </group>
+                                <group string="Other Product Cash">
+                                    <field name="lubes_cash"/>
+                                    <field name="lpg_cash"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Banking">
+                            <group>
+                                <field name="bank_deposit"/>
+                                <field name="bank_reference"/>
+                                <field name="move_id" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" placeholder="Record any discrepancies or handover notes here..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_forecourt_cash_recon_list" model="ir.ui.view">
+        <field name="name">forecourt.cash.reconciliation.list</field>
+        <field name="model">forecourt.cash.reconciliation</field>
+        <field name="arch" type="xml">
+            <list string="Cash Reconciliations"
+                  decoration-warning="state == 'draft'"
+                  decoration-info="state == 'submitted'"
+                  decoration-success="state == 'approved'">
+                <field name="name"/>
+                <field name="recon_date"/>
+                <field name="shift_id"/>
+                <field name="fuel_cash"/>
+                <field name="pos_amount"/>
+                <field name="lubes_cash"/>
+                <field name="lpg_cash"/>
+                <field name="bank_deposit"/>
+                <field name="variance"
+                       decoration-danger="variance &lt; 0"
+                       decoration-success="variance &gt;= 0"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'draft'"
+                       decoration-info="state == 'submitted'"
+                       decoration-success="state == 'approved'"/>
+                <field name="currency_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_forecourt_cash_recon_search" model="ir.ui.view">
+        <field name="name">forecourt.cash.reconciliation.search</field>
+        <field name="model">forecourt.cash.reconciliation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="shift_id"/>
+                <field name="recon_date"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Submitted" name="submitted" domain="[('state','=','submitted')]"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <separator/>
+                <filter string="Today" name="today"
+                        domain="[('recon_date','=',context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="This Month" name="this_month"
+                        domain="[('recon_date','&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Date" name="group_date" context="{'group_by': 'recon_date'}"/>
+                    <filter string="Shift" name="group_shift" context="{'group_by': 'shift_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_forecourt_cash_reconciliation" model="ir.actions.act_window">
+        <field name="name">Cash Reconciliation</field>
+        <field name="res_model">forecourt.cash.reconciliation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No reconciliations yet
+            </p>
+            <p>
+                Create a cash reconciliation record for each shift to track
+                fuel cash, POS, mobile money, lubes and LPG collections
+                against bank deposits.
+            </p>
+        </field>
+    </record>
+
+</odoo>

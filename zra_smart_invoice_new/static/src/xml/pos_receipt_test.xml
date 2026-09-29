@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Test template - completely replace OrderReceipt -->
+    <t t-name="point_of_sale.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="." position="inside">
+            <!-- Add ZRA debug at the very end -->
+            <div style="border-top: 3px solid red; margin-top: 10px; padding-top: 10px; font-size: 10px; background-color: yellow; color: red;">
+                <b>=== ZRA DEBUG SECTION ===</b><br/>
+                Status: <t t-esc="props.data.zra_sync_status or 'No Status'"/><br/>
+                Receipt: <t t-esc="props.data.zra_receipt_number or 'No Receipt'"/><br/>
+                Invoice: <t t-esc="props.data.zra_invoice_number or 'No Invoice'"/><br/>
+                Company: <t t-esc="props.data.headerData.company.name or 'No Company'"/><br/>
+                <b>=== END ZRA DEBUG ===</b>
+            </div>
+        </xpath>
+    </t>
+
+</templates>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Shift Report â€” triggered via wizard action_print_pdf() -->
+    <record id="action_forecourt_shift_report_pdf" model="ir.actions.report">
+        <field name="name">Forecourt Shift Report</field>
+        <field name="model">forecourt.shift.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">forecourt_operations.report_forecourt_shift_document</field>
+        <field name="report_file">forecourt_operations.report_forecourt_shift_document</field>
+        <field name="print_report_name">'Shift_Report_%s' % (object.shift_id.name or '')</field>
+    </record>
+
+    <!-- Shift Report bound directly on forecourt.shift (Print button on shift form) -->
+    <record id="action_forecourt_shift_direct_pdf" model="ir.actions.report">
+        <field name="name">Print Shift Report</field>
+        <field name="model">forecourt.shift</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">forecourt_operations.report_forecourt_shift_direct_document</field>
+        <field name="report_file">forecourt_operations.report_forecourt_shift_direct_document</field>
+        <field name="print_report_name">'Shift_Report_%s' % (object.name or '')</field>
+    </record>
+
+    <!-- Sales Report -->
+    <record id="action_forecourt_sales_report_pdf" model="ir.actions.report">
+        <field name="name">Forecourt Sales Report</field>
+        <field name="model">forecourt.sales.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">forecourt_operations.report_forecourt_sales_document</field>
+        <field name="report_file">forecourt_operations.report_forecourt_sales_document</field>
+        <field name="print_report_name">'Forecourt_Sales_%s_to_%s' % (object.date_from, object.date_to)</field>
+    </record>
+
+    <!-- Reconciliation Report -->
+    <record id="action_forecourt_reconciliation_report_pdf" model="ir.actions.report">
+        <field name="name">Tank Reconciliation Report</field>
+        <field name="model">forecourt.reconciliation.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">forecourt_operations.report_forecourt_reconciliation_document</field>
+        <field name="report_file">forecourt_operations.report_forecourt_reconciliation_document</field>
+        <field name="print_report_name">'Tank_Reconciliation_%s_to_%s' % (object.date_from, object.date_to)</field>
+    </record>
+</odoo>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_fuel_rate_list" model="ir.ui.view">
+        <field name="name">forecourt.fuel.rate.list</field>
+        <field name="model">forecourt.fuel.rate</field>
+        <field name="arch" type="xml">
+            <list string="Pump Rates" default_order="effective_date desc">
+                <field name="effective_date"/>
+                <field name="petrol_rate" widget="monetary"/>
+                <field name="diesel_rate" widget="monetary"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="petrol_cost"/>
+                <field name="diesel_cost"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_fuel_rate_form" model="ir.ui.view">
+        <field name="name">forecourt.fuel.rate.form</field>
+        <field name="model">forecourt.fuel.rate</field>
+        <field name="arch" type="xml">
+            <form string="Pump Rate">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="effective_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="petrol_rate"/>
+                            <field name="diesel_rate"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="petrol_cost"/>
+                        <field name="diesel_cost"/>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_fuel_rate" model="ir.actions.act_window">
+        <field name="name">Pump Rates</field>
+        <field name="res_model">forecourt.fuel.rate</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Configure date-effective petrol &amp; diesel pump rates.</p>
+            <p>Each record applies from its effective date until a later record supersedes it.</p>
+        </field>
+    </record>
+</odoo>

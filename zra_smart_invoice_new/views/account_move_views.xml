@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit Invoice Form View -->
+    <record id="view_account_move_form_inherit_zra" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.zra</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <!-- Customer Invoice -->
+                <button name="action_send_to_zra" type="object" string="Send to ZRA"
+                        class="oe_highlight"
+                        invisible="move_type not in ['out_invoice', 'out_refund'] or state != 'posted' or zra_sync_status == 'synced'"/>
+
+                <!-- Vendor Bill -->
+                <button name="action_send_purchase_to_zra" type="object" string="Send to ZRA"
+                        class="oe_highlight"
+                        invisible="move_type not in ['in_invoice', 'in_refund'] or state != 'posted' or zra_sync_status == 'synced'"/>
+
+                <!-- FIX #9: Debit note button -->
+                <button name="action_send_debit_note_to_zra" type="object" string="Send Debit Note to ZRA"
+                        class="btn-warning"
+                        invisible="move_type != 'out_invoice' or state != 'posted' or zra_sync_status == 'synced' or not zra_debit_reason"/>
+
+                <button name="action_regenerate_qr_code" type="object" string="Regenerate QR"
+                        class="btn-secondary"
+                        invisible="zra_sync_status != 'synced' or move_type not in ['out_invoice', 'out_refund']"/>
+            </xpath>
+
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page string="ZRA Details" name="zra_details"
+                      invisible="move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']">
+                    <group>
+                        <group string="ZRA Receipt Information">
+                            <field name="zra_sync_status" widget="badge"
+                                   decoration-info="zra_sync_status == 'pending'"
+                                   decoration-success="zra_sync_status == 'synced'"
+                                   decoration-danger="zra_sync_status == 'failed'"/>
+                            <!-- FIX #8: Payment type selection -->
+                            <field name="zra_payment_type"
+                                   invisible="zra_sync_status == 'synced'"/>
+                            <field name="zra_invoice_number" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="zra_receipt_number" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="zra_sdc_id" readonly="1"/>
+                            <field name="zra_mrc_no" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                        </group>
+                        <group string="Verification Data">
+                            <field name="zra_internal_data" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="zra_signature" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="zra_vsdc_receipt_date" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="zra_total_tax_amount" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- FIX #10: Credit note reason code -->
+                    <group invisible="move_type != 'out_refund'">
+                        <group string="Credit Note Details">
+                            <field name="zra_refund_reason" required="move_type == 'out_refund'"/>
+                            <field name="zra_original_invoice_id"
+                                   domain="[('move_type', '=', 'out_invoice'), ('state', '=', 'posted')]"/>
+                        </group>
+                    </group>
+
+                    <!-- FIX #9: Debit note reason code -->
+                    <group invisible="move_type != 'out_invoice'">
+                        <group string="Debit Note Details (if applicable)">
+                            <field name="zra_debit_reason"/>
+                            <field name="zra_original_invoice_id"
+                                   invisible="not zra_debit_reason"
+                                   domain="[('move_type', '=', 'out_invoice'), ('state', '=', 'posted')]"
+                                   required="zra_debit_reason != False"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="QR Code">
+                            <field name="zra_qr_code_image" widget="image" readonly="1"
+                                   class="oe_avatar" style="max-width: 200px; max-height: 200px;"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                        </group>
+                        <group string="Sync Status">
+                            <field name="zra_sync_date" readonly="1"/>
+                            <field name="zra_print_count" readonly="1"
+                                   invisible="move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="zra_error_message" readonly="1"
+                                   invisible="zra_sync_status != 'failed'"/>
+                        </group>
+                    </group>
+
+                    <!-- Warning: not yet synced -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="zra_receipt_number or move_type in ['in_invoice', 'in_refund']">
+                        <strong>Important:</strong>
+                        This invoice must be synced with ZRA before printing.
+                        The ZRA Receipt Number must appear on the printed invoice.
+                    </div>
+
+                    <!-- FIX #10: Warning: credit note missing reason -->
+                    <div class="alert alert-danger" role="alert"
+                         invisible="move_type != 'out_refund' or zra_refund_reason">
+                        <strong>ZRA Compliance:</strong>
+                        A Refund Reason is required on all credit notes before syncing with ZRA.
+                        Please select one above.
+                    </div>
+
+                    <!-- Info: vendor bill -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="zra_sync_status == 'synced' or move_type not in ['in_invoice', 'in_refund']">
+                        <strong>Vendor Bill:</strong>
+                        This bill can be synced with ZRA for purchase tracking.
+                        Click "Send to ZRA" in the header to sync.
+                    </div>
+
+                    <!-- checklist #15: manual capture from a supplier not on Smart Invoice -->
+                    <div class="alert alert-secondary" role="alert"
+                         invisible="move_type not in ['in_invoice', 'in_refund']">
+                        <strong>ZRA Registration Type:</strong>
+                        <field name="zra_purchase_reg_type" nolabel="1" class="oe_inline"/><br/>
+                        <span invisible="zra_purchase_reg_type != 'A'">
+                            This bill was fetched automatically from ZRA — the supplier is
+                            registered on Smart Invoice themselves.
+                        </span>
+                        <span invisible="zra_purchase_reg_type == 'A'">
+                            This bill was entered manually. Use this for purchases from a
+                            supplier who is <em>not</em> registered on Smart Invoice — Odoo's
+                            normal "Create Vendor Bill" flow already supports this (checklist #15);
+                            just set a Supplier TPIN if the vendor has one, or leave it blank
+                            for suppliers with none.
+                        </span>
+                    </div>
+
+                    <!-- Success: sales invoice synced -->
+                    <div class="alert alert-success" role="alert"
+                         invisible="zra_sync_status != 'synced' or move_type in ['in_invoice', 'in_refund']">
+                        <h4><strong>✔ ZRA Fiscalized Invoice</strong></h4>
+                        <table class="table table-sm mb-0" style="background: transparent;">
+                            <tr>
+                                <td style="width:150px;"><strong>INV NO:</strong></td>
+                                <td><field name="zra_invoice_number" readonly="1" nolabel="1"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Receipt No:</strong></td>
+                                <td><field name="zra_receipt_number" readonly="1" nolabel="1"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SDC ID:</strong></td>
+                                <td><field name="zra_sdc_id" readonly="1" nolabel="1"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>MRC NO:</strong></td>
+                                <td><field name="zra_mrc_no" readonly="1" nolabel="1"/></td>
+                            </tr>
+                        </table>
+                        <p class="mt-2 mb-0"><em>This information MUST be printed on the invoice for ZRA compliance.</em></p>
+                    </div>
+
+                    <!-- Success: purchase synced -->
+                    <div class="alert alert-success" role="alert"
+                         invisible="zra_sync_status != 'synced' or move_type not in ['in_invoice', 'in_refund']">
+                        <h4><strong>✓ Purchase Synced with ZRA</strong></h4>
+                        <p class="mb-0">This vendor bill has been successfully registered with ZRA.</p>
+                        <p class="mb-0"><small>Synced on: <field name="zra_sync_date" readonly="1" nolabel="1"/></small></p>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Invoice list with ZRA status -->
+    <record id="view_out_invoice_tree_inherit_zra" model="ir.ui.view">
+        <field name="name">view.out.invoice.tree.inherit.zra</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="zra_sync_status" widget="badge" optional="show"
+                       decoration-info="zra_sync_status == 'pending'"
+                       decoration-success="zra_sync_status == 'synced'"
+                       decoration-danger="zra_sync_status == 'failed'"/>
+                <field name="zra_receipt_number" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search filters -->
+    <record id="view_account_move_search_inherit_zra" model="ir.ui.view">
+        <field name="name">account.move.search.inherit.zra</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter string="ZRA Synced"  name="zra_synced"  domain="[('zra_sync_status', '=', 'synced')]"/>
+                <filter string="ZRA Pending" name="zra_pending" domain="[('zra_sync_status', '=', 'pending')]"/>
+                <filter string="ZRA Failed"  name="zra_failed"  domain="[('zra_sync_status', '=', 'failed')]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

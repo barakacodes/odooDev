@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reports sub-menus — loaded after wizard views so actions exist -->
+    <menuitem id="menu_forecourt_shift_report"
+              name="Shift Report"
+              parent="menu_forecourt_reports"
+              action="action_forecourt_shift_report_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_forecourt_sales_report"
+              name="Sales Report"
+              parent="menu_forecourt_reports"
+              action="action_forecourt_sales_report_wizard"
+              sequence="20"/>
+
+    <menuitem id="menu_forecourt_reconciliation_report"
+              name="Tank Reconciliation"
+              parent="menu_forecourt_reports"
+              action="action_forecourt_reconciliation_wizard"
+              sequence="30"/>
+</odoo>

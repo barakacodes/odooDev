@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt')]" position="inside">
+
+            <!-- CSS to hide default Odoo QR codes -->
+            <style>
+                #posqrcode { display: none !important; }
+                img[src*="/report/barcode/QR/"] { display: none !important; }
+            </style>
+
+            <!-- ZRA Section - Show when data has been loaded successfully -->
+            <t t-if="this.zraState and this.zraState.hasData">
+                <div class="zra-section" style="border-top: 2px dashed #000; margin-top: 12px; padding-top: 12px;">
+
+                    <!-- Header -->
+                    <div style="text-align: center; font-weight: bold; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+                        ZRA FISCAL RECEIPT
+                    </div>
+
+                    <!-- QR Code - always show if hasData is true -->
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <img t-att-src="'data:image/png;base64,' + props.data.zra_qr_code_image"
+                             style="width: 110px; height: 110px; border: 2px solid #000; padding: 2px;"/>
+                    </div>
+
+                    <!-- ZRA Details -->
+                    <div style="font-size: 10px; line-height: 1.5; font-family: monospace;">
+
+                        <!-- Invoice Number -->
+                        <div style="margin-bottom: 5px; border-bottom: 1px dotted #999; padding-bottom: 5px;">
+                            <strong>ZRA INVOICE NO:</strong><br/>
+                            <span style="font-size: 11px;"><t t-esc="props.data.zra_invoice_number"/></span>
+                        </div>
+
+                        <!-- Receipt Number -->
+                        <div style="margin-bottom: 5px; border-bottom: 1px dotted #999; padding-bottom: 5px;">
+                            <strong>RECEIPT NO:</strong><br/>
+                            <span style="font-size: 11px;"><t t-esc="props.data.zra_receipt_number"/></span>
+                        </div>
+
+                        <!-- SDC ID & MRC NO -->
+                        <div style="margin-bottom: 5px; border-bottom: 1px dotted #999; padding-bottom: 5px;">
+                            <strong>SDC ID:</strong> <t t-esc="props.data.zra_sdc_id"/><br/>
+                            <strong>MRC NO:</strong> <t t-esc="props.data.zra_mrc_no"/>
+                        </div>
+
+                        <!-- Internal Data -->
+                        <div style="margin-bottom: 5px; border-bottom: 1px dotted #999; padding-bottom: 5px;">
+                            <strong>INTERNAL DATA:</strong><br/>
+                            <span style="font-size: 9px; word-wrap: break-word;"><t t-esc="props.data.zra_internal_data"/></span>
+                        </div>
+
+                        <!-- Signature -->
+                        <div style="margin-bottom: 5px; padding-bottom: 5px;">
+                            <strong>SIGNATURE:</strong><br/>
+                            <span style="font-size: 9px; word-wrap: break-word;"><t t-esc="props.data.zra_signature"/></span>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align: center; font-size: 9px; margin-top: 10px; font-style: italic; border-top: 2px solid #000; padding-top: 8px;">
+                        This receipt has been registered with the<br/>
+                        <strong>Zambia Revenue Authority (ZRA)</strong>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Loading indicator (shown only while loading) -->
+            <t t-if="this.zraState and this.zraState.isLoading">
+                <div style="text-align: center; padding: 10px; margin-top: 12px; border: 1px dashed #999; background-color: #f9f9f9; font-size: 10px;">
+                    <span style="font-weight: bold;">⏳ Loading ZRA Receipt Details...</span><br/>
+                    <span style="font-size: 8px; color: #666;">Please wait</span>
+                </div>
+            </t>
+
+        </xpath>
+    </t>
+
+</templates>

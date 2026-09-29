@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_commission_form" model="ir.ui.view">
+        <field name="name">res.partner.commission.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Commission" attrs="{'invisible': [('is_agent', '=', False)]}">
+                    <group>
+                        <group>
+                            <field name="is_agent"/>
+                            <field name="agent_code"/>
+                            <field name="agent_commission_rate"/>
+                            <field name="agent_commission_type"/>
+                            <field name="agent_min_sales_target"/>
+                        </group>
+                        <group>
+                            <field name="agent_total_sales"/>
+                            <field name="agent_total_commission"/>
+                            <field name="agent_paid_commission"/>
+                            <field name="agent_pending_commission"/>
+                            <field name="agent_sale_count"/>
+                            <field name="agent_rank"/>
+                            <button name="action_view_agent_commissions" string="View Commissions" type="object"/>
+                            <button name="action_view_agent_sales" string="View Sales" type="object"/>
+                        </group>
+                    </group>
+                    <group string="Bank Details">
+                        <field name="agent_bank_account"/>
+                        <field name="agent_bank_name"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

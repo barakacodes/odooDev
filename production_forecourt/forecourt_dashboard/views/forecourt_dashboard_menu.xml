@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_forecourt_dashboard"
+              name="Dashboard"
+              parent="forecourt_operations.menu_forecourt_root"
+              action="forecourt_dashboard.action_forecourt_dashboard"
+              sequence="1"
+              groups="forecourt_operations.group_forecourt_user"/>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit Product Variant Form View -->
+<!--    <record id="view_product_product_form_inherit_zra" model="ir.ui.view">-->
+<!--        <field name="name">product.product.form.inherit.zra</field>-->
+<!--        <field name="model">product.product</field>-->
+<!--        <field name="inherit_id" ref="product.product_normal_form_view"/>-->
+<!--        <field name="arch" type="xml">-->
+
+<!--            &lt;!&ndash; Add button in header &ndash;&gt;-->
+<!--            <xpath expr="//header" position="inside">-->
+<!--                <button name="action_register_with_zra" type="object" string="Register with ZRA"-->
+<!--                        class="btn-primary"-->
+<!--                        invisible="zra_registered or not zra_classification_code"/>-->
+<!--            </xpath>-->
+
+<!--            &lt;!&ndash; Add ZRA fields tab &ndash;&gt;-->
+<!--            <xpath expr="//page[@name='general_information']" position="after">-->
+<!--                <page string="ZRA Information" name="zra_info">-->
+<!--                    <group>-->
+<!--                        <group string="ZRA Registration">-->
+<!--                            <field name="zra_item_code" placeholder="ZMXXXXXX000001"/>-->
+<!--                            <field name="zra_classification_code" placeholder="50102517" required="1"/>-->
+<!--                            <field name="zra_tax_type"/>-->
+<!--                            <field name="zra_registered" readonly="1"/>-->
+<!--                            <field name="zra_registration_date" readonly="1"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+<!--                </page>-->
+<!--            </xpath>-->
+
+<!--        </field>-->
+<!--    </record>-->
+
+</odoo>

@@ -1,0 +1,15 @@
+{
+    'name': 'TOP SEED ZRA Integration',
+    'version': '1.0.0',
+    'category': 'Accounting',
+    'summary': 'ZRA Smart Invoice Integration',
+    'description': 'ZRA Smart Invoice VSDC Integration for TOP SEED Ltd',
+    'author': 'ProcessDial Business Solutions',
+    'website': 'https://www.processdial.net',
+    'depends': ['base'],
+    'data': [],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
+    'license': 'LGPL-3',
+}

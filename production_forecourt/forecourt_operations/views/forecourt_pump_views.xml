@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_forecourt_pump_list" model="ir.ui.view">
+        <field name="name">forecourt.pump.list</field>
+        <field name="model">forecourt.pump</field>
+        <field name="arch" type="xml">
+            <list string="Pumps">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="tank_id"/>
+                <field name="warehouse_id"/>
+                <field name="warehouse_id"/>
+                <field name="warehouse_id"/>
+                <field name="nozzle_count" string="Nozzles"/>
+                <field name="status" widget="badge"
+                       decoration-success="status=='active'"
+                       decoration-warning="status=='maintenance'"
+                       decoration-muted="status in ('idle','decommissioned')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_forecourt_pump_form" model="ir.ui.view">
+        <field name="name">forecourt.pump.form</field>
+        <field name="model">forecourt.pump</field>
+        <field name="arch" type="xml">
+            <form string="Pump">
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="idle,active,maintenance"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Pump Name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Pump Details">
+                            <field name="code"/>
+                            <field name="tank_id"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="warehouse_id" readonly="1"/>
+                            <field name="warehouse_id" readonly="1"/>
+                            <field name="warehouse_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notes…"/>
+                    <notebook>
+                        <page string="Nozzles" name="nozzles">
+                            <field name="nozzle_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="opening_reading"/>
+                                    <field name="closing_reading"/>
+                                    <field name="volume_dispensed" readonly="1"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Meter Readings" name="meters">
+                            <field name="meter_ids" readonly="1">
+                                <list>
+                                    <field name="reading_datetime"/>
+                                    <field name="reading_type"/>
+                                    <field name="nozzle_id"/>
+                                    <field name="meter_value"/>
+                                    <field name="previous_reading"/>
+                                    <field name="volume"/>
+                                    <field name="recorded_by"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_forecourt_pump" model="ir.actions.act_window">
+        <field name="name">Pumps &amp; Nozzles</field>
+        <field name="res_model">forecourt.pump</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

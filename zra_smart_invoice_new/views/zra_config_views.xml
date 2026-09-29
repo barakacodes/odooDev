@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ZRA Configuration Form View -->
+    <record id="view_zra_config_form" model="ir.ui.view">
+        <field name="name">zra.config.form</field>
+        <field name="model">zra.config</field>
+        <field name="arch" type="xml">
+            <form string="ZRA Configuration">
+                <header>
+                    <!-- groups= here is a UI convenience only — the real
+                         enforcement is _check_zra_manager_access() on each
+                         method itself (models/zra_config.py), since a
+                         view-level restriction alone doesn't stop a direct
+                         RPC/method call. -->
+                    <button name="action_initialize_device" type="object" string="Initialize Device"
+                            class="oe_highlight" invisible="is_initialized"
+                            groups="account.group_account_manager"/>
+                    <button name="action_test_connection" type="object" string="Test Connection"
+                            class="btn-primary" groups="account.group_account_manager"/>
+                    <button name="action_sync_standard_codes" type="object" string="Sync Standard Codes"
+                            class="btn-secondary" groups="account.group_account_manager"/>
+                    <button name="action_sync_classification_codes" type="object" string="Sync Classification Codes"
+                            class="btn-secondary" groups="account.group_account_manager"/>
+                    <button name="action_sync_items_from_zra" type="object" string="Sync Items from ZRA"
+                            class="btn-secondary" groups="account.group_account_manager"/>
+                    <button name="action_sync_stock_from_zra" type="object" string="Sync Stock from ZRA"
+                            class="btn-secondary" groups="account.group_account_manager"/>
+                    <button name="action_fetch_branch_info" type="object" string="Fetch Branch Info"
+                            class="btn-secondary" groups="account.group_account_manager"/>
+                    <button name="action_view_logs" type="object" string="View Logs"
+                            class="btn-secondary"/>
+                    <button name="action_force_sandbox_init" type="object" string="Force Init (Sandbox)"
+                            class="btn-danger" invisible="1"
+                            groups="account.group_account_manager"
+                            confirm="This will bypass VSDC validation for testing only. Continue?"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_logs" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="failed_sync_count" widget="statinfo" string="Failed Syncs"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Initialized" bg_color="text-bg-success"
+                            invisible="not is_initialized"/>
+                    <widget name="web_ribbon" title="Not Initialized" bg_color="text-bg-danger"
+                            invisible="is_initialized"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="company_id" placeholder="Company"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="VSDC Connection">
+                            <field name="vsdc_url" placeholder="http://localhost:8080/zravsdc"/>
+                            <field name="environment"/>
+                            <field name="timeout"/>
+                        </group>
+                        <group string="ZRA Credentials">
+                            <field name="tpin" placeholder="1002679576"/>
+                            <field name="branch_id" placeholder="000"/>
+                            <field name="device_serial" placeholder="SDC0010000553"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Automatic Synchronization">
+                            <field name="auto_sync_invoices"/>
+                            <field name="auto_sync_pos"/>
+                            <field name="auto_sync_purchases"/>
+                            <field name="auto_sync_stock"/>
+                        </group>
+                        <group string="Initialization Status">
+                            <field name="is_initialized" readonly="1"/>
+                            <field name="initialization_date" readonly="1"/>
+                            <field name="last_sync_date" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Statistics">
+                            <field name="total_invoices_synced"/>
+                            <field name="total_pos_synced"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <!-- checklist #7 (MANDATORY): Get Branch Info -->
+                    <group string="Branch Information (ZRA)"
+                           invisible="not branch_info_fetched_date">
+                        <group>
+                            <field name="branch_name" readonly="1"/>
+                            <field name="branch_status_code" readonly="1"/>
+                            <field name="branch_is_hq" readonly="1"/>
+                            <field name="branch_info_fetched_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="branch_province" readonly="1"/>
+                            <field name="branch_district" readonly="1"/>
+                            <field name="branch_sector" readonly="1"/>
+                            <field name="branch_manager_name" readonly="1"/>
+                            <field name="branch_manager_tel" readonly="1"/>
+                            <field name="branch_manager_email" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="branch_info_fetched_date">
+                        <strong>ZRA Compliance:</strong> Click "Fetch Branch Info" above to
+                        confirm this branch is correctly registered with ZRA (checklist item #7, mandatory).
+                    </div>
+
+                    <notebook>
+                        <page string="Help">
+                            <group>
+                                <div class="alert alert-info" role="alert">
+                                    <h4>Setup Instructions:</h4>
+                                    <ol>
+                                        <li>Ensure VSDC is deployed and running on your server</li>
+                                        <li>Enter your TPIN, Branch ID, and Device Serial Number (from ZRA)</li>
+                                        <li>Click "Test Connection" to verify VSDC connectivity</li>
+                                        <li>Click "Initialize Device" to register with ZRA (one-time only)</li>
+                                        <li>Click "Sync Standard Codes" to download tax codes and classifications</li>
+                                        <li>Configure products with UNSPSC classification codes</li>
+                                        <li>Enable automatic synchronization options</li>
+                                    </ol>
+                                    <p><strong>Note:</strong> The rcptNo (receipt number) from ZRA MUST be printed on all invoices.</p>
+                                </div>
+                            </group>
+                        </page>
+                        <page string="Version Info">
+                            <group>
+                                <div class="alert alert-success" role="alert">
+                                    <h4>Version 1.5.0 — VSDC API Specification v1.0.7 Compliance Pass</h4>
+                                    <p>Rebuilt against the official ZRA VSDC API Specification v1.0.7 and the
+                                       ZRA Smart Invoice Developer Self-Check List:</p>
+                                    <ul>
+                                        <li>Full VAT / IPL / Tourism Levy / Excise / Turnover Tax breakdown</li>
+                                        <li>Item update, item list, and item composition endpoints</li>
+                                        <li>Purchase fetch, stock item list, and branch/customer/user endpoints</li>
+                                        <li>Invoice immutability enforcement and reprint watermark tracking</li>
+                                        <li>Enhanced fiscal tax invoice report and ZRA Sales Register</li>
+                                    </ul>
+                                </div>
+                                <div class="alert alert-info mt-2" role="alert">
+                                    <strong>Developed by:</strong> Esau Ngoma, Full Stack Software Engineer<br/>
+                                    <strong>Contact:</strong> esaungoma004@gmail.com
+                                </div>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- checklist #32: audit trail of config changes -->
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ZRA Configuration Tree View -->
+    <record id="view_zra_config_tree" model="ir.ui.view">
+        <field name="name">zra.config.tree</field>
+        <field name="model">zra.config</field>
+        <field name="arch" type="xml">
+            <list string="ZRA Configurations">
+                <field name="company_id"/>
+                <field name="tpin"/>
+                <field name="branch_id"/>
+                <field name="environment" widget="badge"
+                       decoration-info="environment == 'sandbox'"
+                       decoration-success="environment == 'production'"/>
+                <field name="is_initialized" widget="boolean"/>
+                <field name="total_invoices_synced"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ZRA Configuration Action -->
+    <record id="action_zra_config" model="ir.actions.act_window">
+        <field name="name">ZRA Configuration</field>
+        <field name="res_model">zra.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configure ZRA Smart Invoice Integration
+            </p>
+            <p>
+                Set up your ZRA credentials and VSDC connection settings.
+            </p>
+        </field>
+    </record>
+
+</odoo>

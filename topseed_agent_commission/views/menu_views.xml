@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Commission Menu -->
+    <menuitem id="menu_commission_root" 
+              name="Commissions" 
+              parent="sale.menu_sale_root"
+              sequence="100"/>
+    
+    <menuitem id="menu_commission_config" 
+              name="Commission Rules" 
+              parent="menu_commission_root"
+              action="action_commission_rule"
+              sequence="10"/>
+    
+    <menuitem id="menu_commission_lines" 
+              name="Commission Lines" 
+              parent="menu_commission_root"
+              action="action_commission_line"
+              sequence="20"/>
+    
+    <menuitem id="menu_commission_payments" 
+              name="Commission Payments" 
+              parent="menu_commission_root"
+              action="action_commission_payment"
+              sequence="30"/>
+    
+    <menuitem id="menu_commission_dashboard" 
+              name="Agent Dashboard" 
+              parent="menu_commission_root"
+              action="action_commission_dashboard"
+              sequence="40"/>
+</odoo>

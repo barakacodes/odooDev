@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="forecourt_product_template_form_view" model="ir.ui.view">
+        <field name="name">forecourt.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Forecourt" name="forecourt_tab">
+                    <group>
+                        <group string="Forecourt Classification">
+                            <field name="forecourt_product_type"/>
+                            <field name="fuel_grade"
+                                   invisible="forecourt_product_type != 'fuel'"/>
+                            <field name="lpg_cylinder_size"
+                                   invisible="forecourt_product_type != 'lpg'"/>
+                            <field name="unit_of_sale"/>
+                        </group>
+                        <group string="Pricing">
+                            <field name="forecourt_selling_price"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

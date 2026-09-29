@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_forecourt_fuel_rate_user,access.forecourt.fuel.rate.user,model_forecourt_fuel_rate,forecourt_operations.group_forecourt_user,1,0,0,0
+access_forecourt_fuel_rate_manager,access.forecourt.fuel.rate.manager,model_forecourt_fuel_rate,forecourt_operations.group_forecourt_manager,1,1,1,1
+access_forecourt_shift_fuel_entry_user,access.forecourt.shift.fuel.entry.user,model_forecourt_shift_fuel_entry,forecourt_operations.group_forecourt_user,1,1,1,0
+access_forecourt_shift_fuel_entry_supervisor,access.forecourt.shift.fuel.entry.supervisor,model_forecourt_shift_fuel_entry,forecourt_operations.group_forecourt_supervisor,1,1,1,1
+access_forecourt_shift_fuel_entry_manager,access.forecourt.shift.fuel.entry.manager,model_forecourt_shift_fuel_entry,forecourt_operations.group_forecourt_manager,1,1,1,1
