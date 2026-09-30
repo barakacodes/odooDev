@@ -1,25 +1,23 @@
+
+# Odoo runtime data
+odoo/data_dir/
+*.pid
+sessions/
+filestore/
+
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
 .venv/
 venv/
 env/
 
-# Odoo
-*.pyc
-odoo.log
+# Logs / env
 *.log
-filestore/
-.odoorc
+.env
 
-# IDE
+# IDE / OS
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db
-
-# Env files
-.env
